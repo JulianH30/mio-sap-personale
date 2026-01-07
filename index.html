@@ -11,6 +11,8 @@
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         .recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        /* Stile per il calendario */
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto">
@@ -34,13 +36,23 @@
         </button>
     </div>
 
+    <div class="mt-8 space-y-4">
+        <div class="glass p-4 rounded-xl flex items-center justify-between border border-emerald-500/10">
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-tighter">Data per Report:</span>
+            <input type="date" id="reportDate" class="bg-transparent text-emerald-500 font-mono outline-none text-sm">
+        </div>
+        <button onclick="triggerReport()" id="reportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black tracking-widest border border-emerald-500/20 btn-active uppercase text-xs">
+            📊 Genera Master Report
+        </button>
+    </div>
+
     <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-95 p-6 flex flex-col z-50">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modalTitle" class="text-xl font-bold tracking-widest text-emerald-500"></h2>
             <button onclick="closeModal()" class="text-gray-500 text-sm tracking-widest">CHIUDI [X]</button>
         </div>
         
-        <input type="text" id="mainInput" placeholder="Inserisci dato o usa la voce..." 
+        <input type="text" id="mainInput" placeholder="Scrivi o usa la voce..." 
                class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-6 focus:border-emerald-500 transition-colors">
         
         <div class="flex gap-4 mb-8">
@@ -49,39 +61,54 @@
             <button id="fileBtn" onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest uppercase">📸 Allegato</button>
         </div>
 
-        <div id="filePreview" class="text-xs text-emerald-500 mb-4 hidden font-mono"></div>
+        <div id="filePreview" class="text-xs text-emerald-500 mb-4 hidden font-mono italic"></div>
 
         <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
     </div>
-    <div class="mt-8">
-    <button onclick="triggerReport()" id="reportBtn" class="w-full glass p-4 rounded-xl text-emerald-500 font-bold border-emerald-500/30">
-        📊 GENERA REPORT GIORNALIERO
-    </button>
-</div>
-
-<script>
-// AGGIUNGI QUESTA FUNZIONE NELLO SCRIPT
-async function triggerReport() {
-    const btn = document.getElementById('reportBtn');
-    btn.innerText = "GENERAZIONE IN CORSO...";
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ azione: "GENERA_REPORT" })
-        });
-        btn.innerText = "✅ REPORT SALVATO IN DRIVE";
-        setTimeout(() => { btn.innerText = "📊 GENERA REPORT GIORNALIERO"; }, 3000);
-    } catch (e) { btn.innerText = "ERRORE REPORT"; }
-}
-</script>
 
     <script>
         let currentModule = "";
         let currentFolder = "";
         let attachedFile = { data: null, name: null, type: null };
+        
+        // USA SEMPRE IL TUO ULTIMO URL DI DEPLOYMENT QUI SOTTO
         const API_URL = "https://script.google.com/macros/s/AKfycbzbSLOCqu02DT3e2Dr2k0NZgro0r3C2B8rNFOVgGscPpH3zc9-u8Ikkn5bIVZPAjtvS/exec";
 
+        // FUNZIONE PER IL REPORT
+        async function triggerReport() {
+            const btn = document.getElementById('reportBtn');
+            let dataScelta = document.getElementById('reportDate').value;
+            
+            // Conversione data da YYYY-MM-DD a DD/MM/YYYY per Google Sheets
+            if(dataScelta) {
+                const parts = dataScelta.split('-');
+                dataScelta = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            btn.innerText = "GENERAZIONE IN CORSO...";
+            btn.disabled = true;
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ 
+                        azione: "GENERA_REPORT",
+                        dataScelta: dataScelta 
+                    })
+                });
+                btn.innerText = "✅ REPORT SALVATO IN DRIVE";
+                setTimeout(() => { 
+                    btn.innerText = "📊 Genera Master Report"; 
+                    btn.disabled = false;
+                }, 3000);
+            } catch (e) {
+                btn.innerText = "ERRORE CONNESSIONE";
+                btn.disabled = false;
+            }
+        }
+
+        // LOGICA MODULI
         function openModule(name, folderKey) {
             currentModule = name;
             currentFolder = folderKey;
@@ -137,12 +164,11 @@ async function triggerReport() {
                 fileData: attachedFile.data,
                 fileName: attachedFile.name,
                 mimeType: attachedFile.type,
-                // Mappatura dinamica
                 evento: (currentModule === "Diario") ? input : "",
                 importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
                 oggetto: (currentModule === "Inventario") ? input : "",
-                note: "Caricato via Black Box Mobile",
-                keywords: "#media #mobile"
+                note: "Caricato via Mobile Black Box",
+                keywords: "#media #sap"
             };
 
             try {
@@ -151,7 +177,6 @@ async function triggerReport() {
                     mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
-                
                 btn.innerText = "TRASMISSIONE COMPLETATA";
                 setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1500);
             } catch (error) {
@@ -162,6 +187,3 @@ async function triggerReport() {
     </script>
 </body>
 </html>
-
-
-
