@@ -9,108 +9,134 @@
         body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
+        .recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto">
     <header class="mb-8 mt-4">
         <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
-        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • 2026 Edition</p>
+        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • Media Engine Active</p>
     </header>
 
     <div class="grid grid-cols-2 gap-4">
-        <button onclick="openModule('Finanze')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">💰</span>
-            <span class="text-xs font-semibold">FINANZE</span>
+        <button onclick="openModule('Finanze', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">💰</span><span class="text-xs font-semibold uppercase">Finanze</span>
         </button>
-        <button onclick="openModule('Inventario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">📦</span>
-            <span class="text-xs font-semibold">INVENTARIO</span>
+        <button onclick="openModule('Inventario', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">📦</span><span class="text-xs font-semibold uppercase">Inventario</span>
         </button>
-        <button onclick="openModule('Scontrini')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">🧾</span>
-            <span class="text-xs font-semibold">SCONTRINI</span>
+        <button onclick="openModule('Scontrini', 'SCONTRINI_OCR')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">🧾</span><span class="text-xs font-semibold uppercase">Scontrini</span>
         </button>
-        <button onclick="openModule('Diario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">✍️</span>
-            <span class="text-xs font-semibold">DIARIO</span>
+        <button onclick="openModule('Diario', 'FOTO_EVENTI')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">✍️</span><span class="text-xs font-semibold uppercase">Diario</span>
         </button>
     </div>
 
-    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-90 p-6 flex flex-col">
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-95 p-6 flex flex-col z-50">
         <div class="flex justify-between items-center mb-6">
-            <h2 id="modalTitle" class="text-xl font-bold"></h2>
-            <button onclick="closeModal()" class="text-gray-400">CHIUDI</button>
+            <h2 id="modalTitle" class="text-xl font-bold tracking-widest text-emerald-500"></h2>
+            <button onclick="closeModal()" class="text-gray-500 text-sm tracking-widest">CHIUDI [X]</button>
         </div>
         
-        <input type="text" id="mainInput" placeholder="Descrizione o dettatura..." class="bg-transparent border-b border-gray-700 w-full py-4 text-xl outline-none mb-6">
+        <input type="text" id="mainInput" placeholder="Inserisci dato o usa la voce..." 
+               class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-6 focus:border-emerald-500 transition-colors">
         
         <div class="flex gap-4 mb-8">
-            <button onclick="startVoice()" class="flex-1 bg-gray-800 p-4 rounded-xl text-sm">🎙️ VOCE</button>
-            <input type="file" id="fileInput" class="hidden" onchange="handleFile(this)">
-            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-800 p-4 rounded-xl text-sm">📸 FOTO</button>
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest">🎙️ VOCE</button>
+            <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*" onchange="handleFile(this)">
+            <button id="fileBtn" onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest uppercase">📸 Allegato</button>
         </div>
 
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold tracking-widest btn-active">INVIA AL DATABASE</button>
+        <div id="filePreview" class="text-xs text-emerald-500 mb-4 hidden font-mono"></div>
+
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
     </div>
 
     <script>
         let currentModule = "";
+        let currentFolder = "";
+        let attachedFile = { data: null, name: null, type: null };
         const API_URL = "https://script.google.com/macros/s/AKfycbzI_e9F4RI6sO0iPaUT-18B11QD7Av1-p63s5KbGBAR1c0CjI9_KV8V4KZl4SgSCU68/exec";
 
-        function openModule(name) {
+        function openModule(name, folderKey) {
             currentModule = name;
+            currentFolder = folderKey;
             document.getElementById('modalTitle').innerText = name.toUpperCase();
             document.getElementById('modal').classList.remove('hidden');
         }
 
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
+            attachedFile = { data: null, name: null, type: null };
+            document.getElementById('filePreview').classList.add('hidden');
+            document.getElementById('mainInput').value = "";
+        }
+
+        function handleFile(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                attachedFile.data = e.target.result.split(',')[1];
+                attachedFile.name = file.name;
+                attachedFile.type = file.type;
+                document.getElementById('filePreview').innerText = "✓ FILE PRONTO: " + file.name.substring(0, 20) + "...";
+                document.getElementById('filePreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
         }
 
         function startVoice() {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'it-IT';
+            const btn = document.getElementById('voiceBtn');
+            btn.classList.add('recording');
+            
             recognition.onresult = (event) => {
                 document.getElementById('mainInput').value = event.results[0][0].transcript;
+                btn.classList.remove('recording');
             };
+            recognition.onerror = () => btn.classList.remove('recording');
             recognition.start();
         }
 
         async function sendData() {
             const input = document.getElementById('mainInput').value;
             const btn = document.getElementById('sendBtn');
-            btn.innerText = "TRASMISSIONE IN CORSO...";
+            if(!input && !attachedFile.data) return alert("Inserisci un dato o una foto");
+
+            btn.innerText = "CRIPTAGGIO E INVIO...";
+            btn.disabled = true;
             
-            // PAYLOAD CORRETTO PER IL MOTORE UNIVERSALE
             const payload = {
                 modulo: currentModule,
+                folderKey: currentFolder,
+                fileData: attachedFile.data,
+                fileName: attachedFile.name,
+                mimeType: attachedFile.type,
+                // Mappatura dinamica
                 evento: (currentModule === "Diario") ? input : "",
                 importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
                 oggetto: (currentModule === "Inventario") ? input : "",
-                note: (currentModule !== "Diario") ? input : "Nota inserita via App",
-                keywords: "#test #mobile"
+                note: "Caricato via Black Box Mobile",
+                keywords: "#media #mobile"
             };
 
             try {
-                const response = await fetch(API_URL, {
+                await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Importante per evitare blocchi di sicurezza
+                    mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
                 
-                btn.innerText = "COMPLETATO";
-                setTimeout(() => { 
-                    closeModal(); 
-                    btn.innerText = "INVIA AL DATABASE"; 
-                    document.getElementById('mainInput').value = ""; 
-                }, 1500);
+                btn.innerText = "TRASMISSIONE COMPLETATA";
+                setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1500);
             } catch (error) {
-                btn.innerText = "ERRORE INVIO";
-                console.error(error);
+                btn.innerText = "ERRORE DI RETE";
+                btn.disabled = false;
             }
         }
     </script>
 </body>
-
 </html>
-
