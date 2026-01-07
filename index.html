@@ -81,21 +81,35 @@
             const btn = document.getElementById('sendBtn');
             btn.innerText = "TRASMISSIONE IN CORSO...";
             
-            // Logica di invio semplificata (sarà espansa per ogni modulo)
+            // PAYLOAD CORRETTO PER IL MOTORE UNIVERSALE
             const payload = {
                 modulo: currentModule,
-                note: input,
-                // Altri campi verranno mappati qui
+                evento: (currentModule === "Diario") ? input : "",
+                importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
+                oggetto: (currentModule === "Inventario") ? input : "",
+                note: (currentModule !== "Diario") ? input : "Nota inserita via App",
+                keywords: "#test #mobile"
             };
 
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-
-            btn.innerText = "COMPLETATO";
-            setTimeout(() => { closeModal(); btn.innerText = "INVIA AL DATABASE"; document.getElementById('mainInput').value = ""; }, 1500);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Importante per evitare blocchi di sicurezza
+                    body: JSON.stringify(payload)
+                });
+                
+                btn.innerText = "COMPLETATO";
+                setTimeout(() => { 
+                    closeModal(); 
+                    btn.innerText = "INVIA AL DATABASE"; 
+                    document.getElementById('mainInput').value = ""; 
+                }, 1500);
+            } catch (error) {
+                btn.innerText = "ERRORE INVIO";
+                console.error(error);
+            }
         }
     </script>
 </body>
+
 </html>
