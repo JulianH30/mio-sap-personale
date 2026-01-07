@@ -53,6 +53,28 @@
 
         <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
     </div>
+    <div class="mt-8">
+    <button onclick="triggerReport()" id="reportBtn" class="w-full glass p-4 rounded-xl text-emerald-500 font-bold border-emerald-500/30">
+        📊 GENERA REPORT GIORNALIERO
+    </button>
+</div>
+
+<script>
+// AGGIUNGI QUESTA FUNZIONE NELLO SCRIPT
+async function triggerReport() {
+    const btn = document.getElementById('reportBtn');
+    btn.innerText = "GENERAZIONE IN CORSO...";
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ azione: "GENERA_REPORT" })
+        });
+        btn.innerText = "✅ REPORT SALVATO IN DRIVE";
+        setTimeout(() => { btn.innerText = "📊 GENERA REPORT GIORNALIERO"; }, 3000);
+    } catch (e) { btn.innerText = "ERRORE REPORT"; }
+}
+</script>
 
     <script>
         let currentModule = "";
@@ -140,4 +162,5 @@
     </script>
 </body>
 </html>
+
 
