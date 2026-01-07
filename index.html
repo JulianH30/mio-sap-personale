@@ -11,14 +11,16 @@
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         .recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        /* Stile per il calendario */
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        /* Scrollbar personalizzata per la lista file */
+        #filePreview::-webkit-scrollbar { width: 4px; }
+        #filePreview::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto">
     <header class="mb-8 mt-4">
         <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
-        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • Media Engine Active</p>
+        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • Multi-Media Active</p>
     </header>
 
     <div class="grid grid-cols-2 gap-4">
@@ -55,13 +57,13 @@
         <input type="text" id="mainInput" placeholder="Scrivi o usa la voce..." 
                class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-6 focus:border-emerald-500 transition-colors">
         
-        <div class="flex gap-4 mb-8">
+        <div class="flex gap-4 mb-4">
             <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest">🎙️ VOCE</button>
-            <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*" onchange="handleFile(this)">
-            <button id="fileBtn" onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest uppercase">📸 Allegato</button>
+            <input type="file" id="fileInput" class="hidden" accept="*/*" multiple onchange="handleFiles(this)">
+            <button id="fileBtn" onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest uppercase">📎 Allegati</button>
         </div>
 
-        <div id="filePreview" class="text-xs text-emerald-500 mb-4 hidden font-mono italic"></div>
+        <div id="filePreview" class="max-h-32 overflow-y-auto mb-6 hidden space-y-2"></div>
 
         <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
     </div>
@@ -69,46 +71,33 @@
     <script>
         let currentModule = "";
         let currentFolder = "";
-        let attachedFile = { data: null, name: null, type: null };
+        let attachedFiles = []; // Array per gestire più file
         
-        // USA SEMPRE IL TUO ULTIMO URL DI DEPLOYMENT QUI SOTTO
         const API_URL = "https://script.google.com/macros/s/AKfycbxmCl7QET9TfsOkwzkvHPRlv8KROgS7t-vHOAiVcc4-VcbSUz9NA_AY6qIfLYvDqAfN/exec";
 
-        // FUNZIONE PER IL REPORT
         async function triggerReport() {
             const btn = document.getElementById('reportBtn');
             let dataScelta = document.getElementById('reportDate').value;
-            
-            // Conversione data da YYYY-MM-DD a DD/MM/YYYY per Google Sheets
             if(dataScelta) {
                 const parts = dataScelta.split('-');
                 dataScelta = `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-
             btn.innerText = "GENERAZIONE IN CORSO...";
             btn.disabled = true;
-
             try {
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({ 
-                        azione: "GENERA_REPORT",
-                        dataScelta: dataScelta 
-                    })
+                    body: JSON.stringify({ azione: "GENERA_REPORT", dataScelta: dataScelta })
                 });
                 btn.innerText = "✅ REPORT SALVATO IN DRIVE";
-                setTimeout(() => { 
-                    btn.innerText = "📊 Genera Master Report"; 
-                    btn.disabled = false;
-                }, 3000);
+                setTimeout(() => { btn.innerText = "📊 Genera Master Report"; btn.disabled = false; }, 3000);
             } catch (e) {
                 btn.innerText = "ERRORE CONNESSIONE";
                 btn.disabled = false;
             }
         }
 
-        // LOGICA MODULI
         function openModule(name, folderKey) {
             currentModule = name;
             currentFolder = folderKey;
@@ -118,22 +107,47 @@
 
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
-            attachedFile = { data: null, name: null, type: null };
-            document.getElementById('filePreview').classList.add('hidden');
+            attachedFiles = [];
+            renderFileList();
             document.getElementById('mainInput').value = "";
         }
 
-        function handleFile(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                attachedFile.data = e.target.result.split(',')[1];
-                attachedFile.name = file.name;
-                attachedFile.type = file.type;
-                document.getElementById('filePreview').innerText = "✓ FILE PRONTO: " + file.name.substring(0, 20) + "...";
-                document.getElementById('filePreview').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
+        // Gestione di file multipli
+        function handleFiles(input) {
+            const files = Array.from(input.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    attachedFiles.push({
+                        data: e.target.result.split(',')[1],
+                        name: file.name,
+                        type: file.type
+                    });
+                    renderFileList();
+                };
+                reader.readAsDataURL(file);
+            });
+            input.value = ""; // Reset per permettere di ri-selezionare lo stesso file
+        }
+
+        function renderFileList() {
+            const preview = document.getElementById('filePreview');
+            if (attachedFiles.length === 0) {
+                preview.classList.add('hidden');
+                return;
+            }
+            preview.innerHTML = attachedFiles.map((f, i) => `
+                <div class="flex justify-between items-center bg-emerald-900/20 p-3 rounded-xl border border-emerald-500/20">
+                    <span class="text-[10px] font-mono text-emerald-400 truncate w-4/5">📎 ${f.name}</span>
+                    <button onclick="removeFile(${i})" class="text-red-500 font-bold px-2 text-sm">✕</button>
+                </div>
+            `).join('');
+            preview.classList.remove('hidden');
+        }
+
+        function removeFile(index) {
+            attachedFiles.splice(index, 1);
+            renderFileList();
         }
 
         function startVoice() {
@@ -141,7 +155,6 @@
             recognition.lang = 'it-IT';
             const btn = document.getElementById('voiceBtn');
             btn.classList.add('recording');
-            
             recognition.onresult = (event) => {
                 document.getElementById('mainInput').value = event.results[0][0].transcript;
                 btn.classList.remove('recording');
@@ -153,22 +166,20 @@
         async function sendData() {
             const input = document.getElementById('mainInput').value;
             const btn = document.getElementById('sendBtn');
-            if(!input && !attachedFile.data) return alert("Inserisci un dato o una foto");
+            if(!input && attachedFiles.length === 0) return alert("Inserisci un dato o un allegato");
 
-            btn.innerText = "CRIPTAGGIO E INVIO...";
+            btn.innerText = "CRIPTAGGIO E INVIO MULTI-FILE...";
             btn.disabled = true;
             
             const payload = {
                 modulo: currentModule,
                 folderKey: currentFolder,
-                fileData: attachedFile.data,
-                fileName: attachedFile.name,
-                mimeType: attachedFile.type,
+                files: attachedFiles, // Invio l'array di file
                 evento: (currentModule === "Diario") ? input : "",
                 importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
                 oggetto: (currentModule === "Inventario") ? input : "",
                 note: "Caricato via Mobile Black Box",
-                keywords: "#media #sap"
+                keywords: "#media #sap #multi"
             };
 
             try {
@@ -187,13 +198,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
