@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP Personal Black Box</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-active:active { transform: scale(0.95); transition: 0.1s; }
+    </style>
+</head>
+<body class="p-4 max-w-lg mx-auto">
+    <header class="mb-8 mt-4">
+        <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
+        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • 2026 Edition</p>
+    </header>
+
+    <div class="grid grid-cols-2 gap-4">
+        <button onclick="openModule('Finanze')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">💰</span>
+            <span class="text-xs font-semibold">FINANZE</span>
+        </button>
+        <button onclick="openModule('Inventario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">📦</span>
+            <span class="text-xs font-semibold">INVENTARIO</span>
+        </button>
+        <button onclick="openModule('Scontrini')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">🧾</span>
+            <span class="text-xs font-semibold">SCONTRINI</span>
+        </button>
+        <button onclick="openModule('Diario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
+            <span class="text-3xl mb-2">✍️</span>
+            <span class="text-xs font-semibold">DIARIO</span>
+        </button>
+    </div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-90 p-6 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="modalTitle" class="text-xl font-bold"></h2>
+            <button onclick="closeModal()" class="text-gray-400">CHIUDI</button>
+        </div>
+        
+        <input type="text" id="mainInput" placeholder="Descrizione o dettatura..." class="bg-transparent border-b border-gray-700 w-full py-4 text-xl outline-none mb-6">
+        
+        <div class="flex gap-4 mb-8">
+            <button onclick="startVoice()" class="flex-1 bg-gray-800 p-4 rounded-xl text-sm">🎙️ VOCE</button>
+            <input type="file" id="fileInput" class="hidden" onchange="handleFile(this)">
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-800 p-4 rounded-xl text-sm">📸 FOTO</button>
+        </div>
+
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold tracking-widest btn-active">INVIA AL DATABASE</button>
+    </div>
+
+    <script>
+        let currentModule = "";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzI_e9F4RI6sO0iPaUT-18B11QD7Av1-p63s5KbGBAR1c0CjI9_KV8V4KZl4SgSCU68/exec";
+
+        function openModule(name) {
+            currentModule = name;
+            document.getElementById('modalTitle').innerText = name.toUpperCase();
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        function startVoice() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'it-IT';
+            recognition.onresult = (event) => {
+                document.getElementById('mainInput').value = event.results[0][0].transcript;
+            };
+            recognition.start();
+        }
+
+        async function sendData() {
+            const input = document.getElementById('mainInput').value;
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = "TRASMISSIONE IN CORSO...";
+            
+            // Logica di invio semplificata (sarà espansa per ogni modulo)
+            const payload = {
+                modulo: currentModule,
+                note: input,
+                // Altri campi verranno mappati qui
+            };
+
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            btn.innerText = "COMPLETATO";
+            setTimeout(() => { closeModal(); btn.innerText = "INVIA AL DATABASE"; document.getElementById('mainInput').value = ""; }, 1500);
+        }
+    </script>
+</body>
+</html>
