@@ -11,16 +11,17 @@
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         .recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-        /* Scrollbar personalizzata per la lista file */
-        #filePreview::-webkit-scrollbar { width: 4px; }
-        #filePreview::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+        #searchResults::-webkit-scrollbar { width: 4px; }
+        #searchResults::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto">
-    <header class="mb-8 mt-4">
-        <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
-        <p class="text-xs text-gray-500 uppercase tracking-widest">System Operational • Multi-Media Active</p>
+    <header class="mb-8 mt-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest">System Operational • Multi-Media Active</p>
+        </div>
+        <button onclick="openSearch()" class="glass p-3 rounded-full text-xl border-emerald-500/50">🔍</button>
     </header>
 
     <div class="grid grid-cols-2 gap-4">
@@ -38,11 +39,7 @@
         </button>
     </div>
 
-    <div class="mt-8 space-y-4">
-        <div class="glass p-4 rounded-xl flex items-center justify-between border border-emerald-500/10">
-            <span class="text-xs font-bold text-gray-500 uppercase tracking-tighter">Data per Report:</span>
-            <input type="date" id="reportDate" class="bg-transparent text-emerald-500 font-mono outline-none text-sm">
-        </div>
+    <div class="mt-8">
         <button onclick="triggerReport()" id="reportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black tracking-widest border border-emerald-500/20 btn-active uppercase text-xs">
             📊 Genera Master Report
         </button>
@@ -51,52 +48,45 @@
     <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-95 p-6 flex flex-col z-50">
         <div class="flex justify-between items-center mb-6">
             <h2 id="modalTitle" class="text-xl font-bold tracking-widest text-emerald-500"></h2>
-            <button onclick="closeModal()" class="text-gray-500 text-sm tracking-widest">CHIUDI [X]</button>
+            <button onclick="closeModal()" class="text-gray-500 text-sm">CHIUDI [X]</button>
         </div>
         
-        <input type="text" id="mainInput" placeholder="Scrivi o usa la voce..." 
-               class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-6 focus:border-emerald-500 transition-colors">
+        <input type="text" id="mainInput" placeholder="Cosa registriamo?" 
+               class="bg-transparent border-b border-gray-800 w-full py-4 text-2xl outline-none mb-4 focus:border-emerald-500 transition-colors">
+        
+        <input type="text" id="tagInput" placeholder="Tag / Parole chiave (es: cristallo, blu, regalo)" 
+               class="bg-transparent border-b border-gray-800 w-full py-2 text-sm outline-none mb-6 italic text-emerald-400">
         
         <div class="flex gap-4 mb-4">
-            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest">🎙️ VOCE</button>
-            <input type="file" id="fileInput" class="hidden" accept="*/*" multiple onchange="handleFiles(this)">
-            <button id="fileBtn" onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest uppercase">📎 Allegati</button>
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800">🎙️ VOCE</button>
+            <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800 uppercase">📎 Allegati</button>
         </div>
 
         <div id="filePreview" class="max-h-32 overflow-y-auto mb-6 hidden space-y-2"></div>
 
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg">TRASMETTI AL CLOUD</button>
+    </div>
+
+    <div id="searchModal" class="hidden fixed inset-0 bg-black bg-opacity-98 p-6 flex flex-col z-50">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold tracking-widest text-emerald-500 uppercase">Ricerca Globale</h2>
+            <button onclick="closeSearch()" class="text-gray-500 text-sm">CHIUDI [X]</button>
+        </div>
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="searchInput" placeholder="Cerca tazza, cristallo..." 
+                   class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none">
+            <button onclick="runSearch()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold">VAI</button>
+        </div>
+        <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
     <script>
         let currentModule = "";
         let currentFolder = "";
-        let attachedFiles = []; // Array per gestire più file
+        let attachedFiles = [];
         
-        const API_URL = "https://script.google.com/macros/s/AKfycbxmCl7QET9TfsOkwzkvHPRlv8KROgS7t-vHOAiVcc4-VcbSUz9NA_AY6qIfLYvDqAfN/exec";
-
-        async function triggerReport() {
-            const btn = document.getElementById('reportBtn');
-            let dataScelta = document.getElementById('reportDate').value;
-            if(dataScelta) {
-                const parts = dataScelta.split('-');
-                dataScelta = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            btn.innerText = "GENERAZIONE IN CORSO...";
-            btn.disabled = true;
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ azione: "GENERA_REPORT", dataScelta: dataScelta })
-                });
-                btn.innerText = "✅ REPORT SALVATO IN DRIVE";
-                setTimeout(() => { btn.innerText = "📊 Genera Master Report"; btn.disabled = false; }, 3000);
-            } catch (e) {
-                btn.innerText = "ERRORE CONNESSIONE";
-                btn.disabled = false;
-            }
-        }
+        const API_URL = "https://script.google.com/macros/s/IL_TUO_URL_DI_DEPLOYMENT/exec";
 
         function openModule(name, folderKey) {
             currentModule = name;
@@ -108,94 +98,91 @@
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
             attachedFiles = [];
-            renderFileList();
             document.getElementById('mainInput').value = "";
+            document.getElementById('tagInput').value = "";
+            document.getElementById('filePreview').innerHTML = "";
         }
 
-        // Gestione di file multipli
+        function openSearch() { document.getElementById('searchModal').classList.remove('hidden'); }
+        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
+
         function handleFiles(input) {
             const files = Array.from(input.files);
             files.forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    attachedFiles.push({
-                        data: e.target.result.split(',')[1],
-                        name: file.name,
-                        type: file.type
-                    });
+                reader.onload = (e) => {
+                    attachedFiles.push({ data: e.target.result.split(',')[1], name: file.name, type: file.type });
                     renderFileList();
                 };
                 reader.readAsDataURL(file);
             });
-            input.value = ""; // Reset per permettere di ri-selezionare lo stesso file
         }
 
         function renderFileList() {
             const preview = document.getElementById('filePreview');
-            if (attachedFiles.length === 0) {
-                preview.classList.add('hidden');
-                return;
-            }
             preview.innerHTML = attachedFiles.map((f, i) => `
-                <div class="flex justify-between items-center bg-emerald-900/20 p-3 rounded-xl border border-emerald-500/20">
-                    <span class="text-[10px] font-mono text-emerald-400 truncate w-4/5">📎 ${f.name}</span>
-                    <button onclick="removeFile(${i})" class="text-red-500 font-bold px-2 text-sm">✕</button>
+                <div class="flex justify-between items-center bg-emerald-900/20 p-2 rounded-lg border border-emerald-500/20 text-[10px]">
+                    <span class="truncate">📎 ${f.name}</span>
+                    <button onclick="attachedFiles.splice(${i},1);renderFileList()" class="text-red-500 ml-2">✕</button>
                 </div>
             `).join('');
-            preview.classList.remove('hidden');
-        }
-
-        function removeFile(index) {
-            attachedFiles.splice(index, 1);
-            renderFileList();
-        }
-
-        function startVoice() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'it-IT';
-            const btn = document.getElementById('voiceBtn');
-            btn.classList.add('recording');
-            recognition.onresult = (event) => {
-                document.getElementById('mainInput').value = event.results[0][0].transcript;
-                btn.classList.remove('recording');
-            };
-            recognition.onerror = () => btn.classList.remove('recording');
-            recognition.start();
+            preview.classList.toggle('hidden', attachedFiles.length === 0);
         }
 
         async function sendData() {
             const input = document.getElementById('mainInput').value;
+            const tags = document.getElementById('tagInput').value;
             const btn = document.getElementById('sendBtn');
-            if(!input && attachedFiles.length === 0) return alert("Inserisci un dato o un allegato");
+            if(!input && attachedFiles.length === 0) return alert("Inserisci dati");
 
-            btn.innerText = "CRIPTAGGIO E INVIO MULTI-FILE...";
+            btn.innerText = "INVIO IN CORSO...";
             btn.disabled = true;
             
             const payload = {
                 modulo: currentModule,
                 folderKey: currentFolder,
-                files: attachedFiles, // Invio l'array di file
+                files: attachedFiles,
                 evento: (currentModule === "Diario") ? input : "",
                 importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
                 oggetto: (currentModule === "Inventario") ? input : "",
-                note: "Caricato via Mobile Black Box",
-                keywords: "#media #sap #multi"
+                keywords: tags + " #sap #mobile",
+                note: "Registrato via SAP App"
             };
 
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-                btn.innerText = "TRASMISSIONE COMPLETATA";
-                setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1500);
-            } catch (error) {
-                btn.innerText = "ERRORE DI RETE";
-                btn.disabled = false;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            btn.innerText = "COMPLETATO";
+            setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1000);
+        }
+
+        async function runSearch() {
+            const query = document.getElementById('searchInput').value;
+            const resDiv = document.getElementById('searchResults');
+            if(!query) return;
+            
+            resDiv.innerHTML = "<p class='text-center text-gray-500 animate-pulse'>Ricerca nei database...</p>";
+            
+            // Per la ricerca usiamo GET per ricevere i dati (JSONP)
+            const script = document.createElement('script');
+            script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(query)}&callback=handleSearchResponse`;
+            document.body.appendChild(script);
+        }
+
+        function handleSearchResponse(results) {
+            const resDiv = document.getElementById('searchResults');
+            if (results.length === 0) {
+                resDiv.innerHTML = "<p class='text-center text-red-500'>Nessun elemento trovato.</p>";
+                return;
             }
+            resDiv.innerHTML = results.map(r => `
+                <div class="glass p-4 rounded-xl border-l-4 border-emerald-500">
+                    <div class="flex justify-between text-[10px] text-emerald-500 font-bold mb-1">
+                        <span>${r.modulo}</span><span>${r.data}</span>
+                    </div>
+                    <div class="text-sm font-bold text-white mb-2">${r.info}</div>
+                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[10px] bg-emerald-900/30 p-2 rounded block text-center border border-emerald-500/20">👁️ APRI ALLEGATO</a>` : ""}
+                </div>
+            `).join('');
         }
     </script>
 </body>
 </html>
-
