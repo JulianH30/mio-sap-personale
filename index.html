@@ -9,160 +9,172 @@
         body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
-        .recording { animation: pulse 1.5s infinite; background-color: #ef4444 !important; }
+        .recording { animation: pulse 1s infinite; background-color: #ef4444 !important; color: white; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto">
-    <header class="mb-8 mt-4">
-        <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-widest">System Operational • Multi-Media Active</p>
+    <header class="mb-8 mt-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-light tracking-tighter text-white">PERSONAL <span class="font-bold text-emerald-500">SAP</span></h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest italic">Ultimate Media Engine v16</p>
+        </div>
+        <button onclick="openSearch()" class="glass p-3 rounded-full text-xl border-emerald-500/50">🔍</button>
     </header>
 
     <div class="grid grid-cols-2 gap-4">
-        <button onclick="openModule('Finanze', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">💰</span><span class="text-xs font-semibold uppercase">Finanze</span>
-        </button>
-        <button onclick="openModule('Inventario', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">📦</span><span class="text-xs font-semibold uppercase">Inventario</span>
-        </button>
-        <button onclick="openModule('Scontrini', 'SCONTRINI_OCR')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">🧾</span><span class="text-xs font-semibold uppercase">Scontrini</span>
-        </button>
-        <button onclick="openModule('Diario', 'FOTO_EVENTI')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-            <span class="text-3xl mb-2">✍️</span><span class="text-xs font-semibold uppercase">Diario</span>
-        </button>
+        <button onclick="openModule('Finanze', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">💰</span><span class="text-xs font-semibold uppercase">Finanze</span></button>
+        <button onclick="openModule('Inventario', 'ID_ROOT')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">📦</span><span class="text-xs font-semibold uppercase">Inventario</span></button>
+        <button onclick="openModule('Scontrini', 'SCONTRINI_OCR')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">🧾</span><span class="text-xs font-semibold uppercase">Scontrini</span></button>
+        <button onclick="openModule('Diario', 'FOTO_EVENTI')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">✍️</span><span class="text-xs font-semibold uppercase">Diario</span></button>
     </div>
 
     <div class="mt-8 space-y-4">
         <div class="glass p-4 rounded-xl space-y-3 border border-emerald-500/10">
-            <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold text-gray-500 uppercase">Da:</span>
-                <input type="date" id="dateStart" class="bg-transparent text-emerald-500 outline-none text-xs">
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold text-gray-500 uppercase">A:</span>
-                <input type="date" id="dateEnd" class="bg-transparent text-emerald-500 outline-none text-xs">
-            </div>
+            <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-gray-500">DA:</span><input type="date" id="dateStart" class="bg-transparent text-emerald-500 outline-none text-xs"></div>
+            <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-gray-500">A:</span><input type="date" id="dateEnd" class="bg-transparent text-emerald-500 outline-none text-xs"></div>
         </div>
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black tracking-widest border border-emerald-500/20 btn-active uppercase text-xs">
-            🚀 Esporta Periodo (HTML)
-        </button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black tracking-widest btn-active uppercase text-xs">🚀 Esporta Periodo</button>
     </div>
 
     <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-95 p-6 flex flex-col z-50">
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="modalTitle" class="text-xl font-bold tracking-widest text-emerald-500"></h2>
-            <button onclick="closeModal()" class="text-gray-500 text-sm">CHIUDI [X]</button>
-        </div>
-        <input type="text" id="mainInput" placeholder="Cosa registriamo?" 
-               class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-6 focus:border-emerald-500 transition-colors">
+        <div class="flex justify-between items-center mb-6"><h2 id="modalTitle" class="text-xl font-bold text-emerald-500"></h2><button onclick="closeModal()" class="text-gray-500 text-sm">CHIUDI [X]</button></div>
+        
+        <input type="text" id="mainInput" placeholder="Cosa registriamo?" class="bg-transparent border-b border-gray-800 w-full py-4 text-2xl outline-none mb-2">
+        <input type="text" id="tagInput" placeholder="Tag / Keywords (es. tazza, cristallo)" class="bg-transparent border-b border-gray-800 w-full py-2 text-sm outline-none mb-6 italic text-emerald-400">
+        
         <div class="flex gap-4 mb-4">
-            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 tracking-widest">🎙️ VOCE</button>
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800 tracking-widest uppercase">🎙️ Voce</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
-            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-5 rounded-2xl text-xs font-bold border border-gray-800 uppercase">📎 Allegati</button>
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800 uppercase">📎 Allegati</button>
         </div>
         <div id="filePreview" class="max-h-32 overflow-y-auto mb-6 hidden space-y-2"></div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black tracking-[0.2em] btn-active shadow-lg shadow-emerald-900/20">TRASMETTI AL CLOUD</button>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black btn-active shadow-lg shadow-emerald-900/30">TRASMETTI AL CLOUD</button>
+    </div>
+
+    <div id="searchModal" class="hidden fixed inset-0 bg-black bg-opacity-98 p-6 flex flex-col z-50">
+        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-emerald-500 uppercase">Ricerca Globale</h2><button onclick="closeSearch()" class="text-gray-500 text-sm">CHIUDI [X]</button></div>
+        <div class="flex gap-2 mb-6"><input type="text" id="searchInput" placeholder="Cerca parole chiave..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none"><button onclick="runSearch()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold">VAI</button></div>
+        <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
     <script>
-        let currentModule = "";
-        let currentFolder = "";
-        let attachedFiles = [];
+        let currentModule = "", currentFolder = "", attachedFiles = [];
         
-        // !!! RICORDATI DI INCOLLARE IL TUO URL DI DEPLOYMENT QUI !!!
-        const API_URL = "https://script.google.com/macros/s/AKfycbyP7VgSbZUVdIfFbXjXkvAAFFF_9wu2IJSvVEcO9LX_K5xCEgR1a2_fFsV9ObkvQQpa/exec";
+        // !!! INCOLLA IL TUO URL DI DEPLOYMENT !!!
+        const API_URL = "https://script.google.com/macros/s/AKfycbzO_8Rb7TRvM39O8womll-uFEaxfgeyEkZhPV2snioFRaXFv6HHhCj6fOOFbrzmMVnW/exec";
 
-        function openModule(name, folderKey) {
-            currentModule = name;
-            currentFolder = folderKey;
-            document.getElementById('modalTitle').innerText = name.toUpperCase();
-            document.getElementById('modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            attachedFiles = [];
-            document.getElementById('filePreview').innerHTML = "";
-            document.getElementById('mainInput').value = "";
-        }
+        function openModule(n, f) { currentModule = n; currentFolder = f; document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); attachedFiles = []; document.getElementById('mainInput').value = ""; document.getElementById('tagInput').value = ""; document.getElementById('filePreview').innerHTML = ""; }
+        function openSearch() { document.getElementById('searchModal').classList.remove('hidden'); }
+        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); document.getElementById('searchResults').innerHTML = ""; }
 
         function handleFiles(input) {
-            const files = Array.from(input.files);
-            files.forEach(file => {
+            Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    attachedFiles.push({ data: e.target.result.split(',')[1], name: file.name, type: file.type });
-                    renderFileList();
-                };
+                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: file.name, type: file.type }); renderFileList(); };
                 reader.readAsDataURL(file);
             });
         }
 
         function renderFileList() {
-            const preview = document.getElementById('filePreview');
-            preview.innerHTML = attachedFiles.map((f, i) => `
-                <div class="flex justify-between items-center bg-emerald-900/20 p-2 rounded-lg text-[10px]">
-                    <span>📎 ${f.name}</span>
-                    <button onclick="attachedFiles.splice(${i},1);renderFileList()" class="text-red-500 ml-2 font-bold">✕</button>
-                </div>
-            `).join('');
-            preview.classList.toggle('hidden', attachedFiles.length === 0);
+            const p = document.getElementById('filePreview');
+            p.innerHTML = attachedFiles.map((f, i) => `<div class="flex justify-between items-center bg-emerald-900/20 p-2 rounded-lg text-[10px]"><span>📎 ${f.name}</span><button onclick="attachedFiles.splice(${i},1);renderFileList()" class="text-red-500 ml-2 font-bold">✕</button></div>`).join('');
+            p.classList.toggle('hidden', attachedFiles.length === 0);
         }
 
-        async function triggerExport() {
-            const btn = document.getElementById('exportBtn');
-            let start = document.getElementById('dateStart').value;
-            let end = document.getElementById('dateEnd').value;
-            if(!start || !end) return alert("Seleziona entrambe le date!");
-            const fmt = (d) => d.split('-').reverse().join('/');
-            btn.innerText = "ESPORTAZIONE IN CORSO...";
-            btn.disabled = true;
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ azione: "GENERA_REPORT", dataInizio: fmt(start), dataEnd: fmt(end) })
-                });
-                btn.innerText = "✅ REPORT SALVATO IN DRIVE";
-                setTimeout(() => { btn.innerText = "🚀 Esporta Periodo (HTML)"; btn.disabled = false; }, 3000);
-            } catch (e) { btn.innerText = "ERRORE"; btn.disabled = false; }
-        }
-
+        // FUNZIONE VOCALE MIGLIORATA
         function startVoice() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'it-IT';
             const btn = document.getElementById('voiceBtn');
-            btn.classList.add('recording');
-            recognition.onresult = (event) => {
-                document.getElementById('mainInput').value = event.results[0][0].transcript;
-                btn.classList.remove('recording');
+            const mainInput = document.getElementById('mainInput');
+            
+            // Verifica supporto browser
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Il tuo browser non supporta la registrazione vocale.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'it-IT';
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                btn.classList.add('recording');
+                btn.innerText = "🔴 ASCOLTO...";
             };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                mainInput.value = transcript;
+                btn.classList.remove('recording');
+                btn.innerText = "🎙️ VOCE";
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Errore vocale: ", event.error);
+                btn.classList.remove('recording');
+                btn.innerText = "🎙️ VOCE";
+                alert("Errore microfono: assicurati di aver dato i permessi.");
+            };
+
+            recognition.onend = () => {
+                btn.classList.remove('recording');
+                btn.innerText = "🎙️ VOCE";
+            };
+
             recognition.start();
         }
 
+        async function triggerExport() {
+            let s = document.getElementById('dateStart').value, e = document.getElementById('dateEnd').value;
+            if(!s || !e) return alert("Seleziona date!");
+            const fmt = (d) => d.split('-').reverse().join('/');
+            const btn = document.getElementById('exportBtn');
+            btn.innerText = "ELABORAZIONE...";
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ azione: "GENERA_REPORT", dataInizio: fmt(s), dataFine: fmt(e) })});
+            btn.innerText = "✅ SALVATO IN DRIVE";
+            setTimeout(() => btn.innerText = "🚀 Esporta Periodo", 3000);
+        }
+
         async function sendData() {
-            const input = document.getElementById('mainInput').value;
             const btn = document.getElementById('sendBtn');
-            btn.innerText = "INVIO IN CORSO...";
+            btn.innerText = "INVIO...";
             btn.disabled = true;
-            const payload = {
-                modulo: currentModule,
-                folderKey: currentFolder,
-                files: attachedFiles,
-                evento: (currentModule === "Diario") ? input : "",
-                importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? input : "",
-                oggetto: (currentModule === "Inventario") ? input : "",
-                note: "Registrato via SAP App",
-                keywords: "#media #sap"
+            const payload = { 
+                modulo: currentModule, 
+                folderKey: currentFolder, 
+                files: attachedFiles, 
+                evento: (currentModule === "Diario") ? document.getElementById('mainInput').value : "", 
+                importo: (currentModule === "Finanze" || currentModule === "Scontrini") ? document.getElementById('mainInput').value : "", 
+                oggetto: (currentModule === "Inventario") ? document.getElementById('mainInput').value : "", 
+                keywords: document.getElementById('tagInput').value,
+                note: "Registrato via SAP App v16" 
             };
-            try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                btn.innerText = "COMPLETATO";
-                setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1500);
-            } catch (e) { btn.innerText = "ERRORE"; btn.disabled = false; }
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            btn.innerText = "COMPLETATO";
+            setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI AL CLOUD"; btn.disabled = false; }, 1000);
+        }
+
+        async function runSearch() {
+            const query = document.getElementById('searchInput').value;
+            if(!query) return;
+            document.getElementById('searchResults').innerHTML = "<p class='text-center animate-pulse'>Ricerca nei database...</p>";
+            const script = document.createElement('script');
+            script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(query)}&callback=handleSearchResponse`;
+            document.body.appendChild(script);
+        }
+
+        function handleSearchResponse(results) {
+            const resDiv = document.getElementById('searchResults');
+            if (results.length === 0) { resDiv.innerHTML = "<p class='text-center text-red-500'>Nessun elemento trovato.</p>"; return; }
+            resDiv.innerHTML = results.map(r => `
+                <div class="glass p-4 rounded-xl border-l-4 border-emerald-500">
+                    <div class="flex justify-between text-[10px] text-emerald-500 font-bold mb-1"><span>${r.modulo}</span><span>${r.data}</span></div>
+                    <div class="text-sm font-bold text-white mb-2">${r.info}</div>
+                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[10px] bg-emerald-900/30 p-2 rounded block text-center border border-emerald-500/20 font-bold">👁️ APRI ALLEGATO</a>` : ""}
+                </div>`).join('');
         }
     </script>
 </body>
