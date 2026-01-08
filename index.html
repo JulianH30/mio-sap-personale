@@ -11,11 +11,12 @@
         #matrix { fixed inset-0 z-0 opacity-20 pointer-events-none; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .btn-active:active { transform: scale(0.96); transition: 0.1s; }
-        .recording { animation: pulse 1.2s infinite; background-color: #dc2626 !important; color: white; }
+        .recording { animation: pulse 1.2s infinite; background-color: #dc2626 !important; color: white; border-color: #ef4444 !important; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .btn-system { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 10px 20px; border-radius: 12px; font-size: 9px; text-transform: uppercase; font-weight: 900; letter-spacing: 0.2em; }
+        .btn-system { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; padding: 10px 20px; border-radius: 12px; font-size: 10px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.1em; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col relative">
@@ -23,21 +24,18 @@
     <canvas id="matrix" class="fixed inset-0 w-full h-full -z-10"></canvas>
 
     <div id="layerSystem" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
-        <p class="text-[9px] text-gray-600 uppercase mb-12 tracking-[0.5em]">Secure Authentication Protocol</p>
-        <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 tracking-[0.4em] font-mono">
-        <button id="btnSys" onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black btn-active shadow-2xl shadow-emerald-900/20 text-white">ACCESS VAULT</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold tracking-widest uppercase animate-pulse">Access Denied</p>
+        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase">SAP</h1>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-[0.4em]">Secure Auth Protocol</p>
+        <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 tracking-[0.4em] font-mono text-white">
+        <button id="btnSys" onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black btn-active text-white">SBLOCCA SISTEMA</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold tracking-widest uppercase animate-bounce text-white">PIN ERRATO</p>
     </div>
 
     <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col z-10">
         <header class="mb-10 mt-6 flex justify-between items-start">
             <div>
                 <h1 class="text-3xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-                    <p class="text-[9px] text-gray-500 tracking-[0.2em] font-mono uppercase">Database Multi-Media Active</p>
-                </div>
+                <p class="text-[9px] text-gray-500 tracking-[0.2em] font-mono uppercase italic">multi-media database active</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="openCalendarSearch()" class="glass p-3 rounded-2xl text-xl">📅</button>
@@ -46,90 +44,84 @@
         </header>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
-            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active border-t border-white/5">
-                <span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black tracking-widest text-emerald-400">Finanze</span>
+            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active">
+                <span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400">Finanze</span>
             </button>
-            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active border-t border-white/5">
-                <span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black tracking-widest text-emerald-400">Diario</span>
+            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active">
+                <span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400">Diario</span>
             </button>
-            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active border-t border-white/5">
-                <span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black tracking-widest text-emerald-400">Inventario</span>
+            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active">
+                <span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400">Inventario</span>
             </button>
-            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active border border-emerald-500/30 bg-emerald-500/5">
-                <span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black tracking-[0.2em]">Spesa</span>
+            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center btn-active border border-emerald-500/30">
+                <span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black">Spesa</span>
             </button>
         </div>
 
-        <div class="glass p-5 rounded-3xl border border-white/5 mb-6">
-            <div class="flex justify-between items-center mb-4"><span class="text-[9px] font-black text-gray-500 uppercase tracking-widest">Data Mining Range</span><span class="text-[9px] text-emerald-500 font-mono italic">2026.01.08</span></div>
+        <div class="glass p-5 rounded-3xl border border-white/5 mb-6 text-[10px] font-bold uppercase text-gray-400">
+            <div class="flex justify-between items-center mb-4 text-emerald-500/50 italic font-mono uppercase"><span>Data Mining</span><span>2026 Active</span></div>
             <div class="space-y-4">
-                <div class="flex justify-between items-center"><span class="text-[10px] text-gray-400 uppercase">Start</span><input type="date" id="dateStart" class="bg-transparent text-white font-mono text-xs outline-none"></div>
-                <div class="flex justify-between items-center"><span class="text-[10px] text-gray-400 uppercase">End</span><input type="date" id="dateEnd" class="bg-transparent text-white font-mono text-xs outline-none"></div>
+                <div class="flex justify-between items-center"><span>Start</span><input type="date" id="dateStart" class="bg-transparent text-white outline-none"></div>
+                <div class="flex justify-between items-center"><span>End</span><input type="date" id="dateEnd" class="bg-transparent text-white outline-none"></div>
             </div>
         </div>
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] tracking-[0.3em] border border-emerald-500/20 btn-active">Export Data Archive</button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] tracking-widest border border-emerald-500/20 btn-active">Export Archive</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center gap-6">
-            <p class="text-[9px] text-gray-700 font-mono tracking-[0.4em] uppercase font-black italic">Dev-Designer Hysenji • v25.0</p>
-            <button onclick="resetApp()" class="btn-system btn-active">System Lock</button>
+            <p class="text-[10px] text-gray-700 font-mono tracking-widest uppercase italic font-bold">Dev-Designer Hysenji • v25.1</p>
+            <button onclick="resetApp()" class="btn-system btn-active">Logout & Reset</button>
         </footer>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black z-[150] flex flex-col items-center justify-center p-8 text-center">
         <h2 id="authTitle" class="text-2xl font-black text-emerald-500 mb-2 uppercase"></h2>
-        <p id="authDesc" class="text-[9px] text-gray-500 mb-10 uppercase tracking-widest"></p>
+        <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase">Identificazione richiesta</p>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 tracking-[0.4em] text-white font-mono">
         <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black btn-active uppercase text-white shadow-xl">Conferma</button>
-        <button onclick="closeAuth()" class="mt-10 text-gray-600 text-[10px] uppercase font-bold tracking-widest">Annulla</button>
+        <button onclick="closeAuth()" class="mt-10 text-gray-600 text-[10px] uppercase font-bold">Chiudi</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 bg-black/95 backdrop-blur-2xl p-6 z-[100] flex flex-col">
         <h2 id="modalTitle" class="text-xl font-black text-emerald-500 mb-8 uppercase text-center tracking-widest"></h2>
-        <div class="flex-grow">
-            <textarea id="mainInput" placeholder="Recording text..." class="bg-transparent border-b border-white/10 w-full py-6 text-2xl outline-none mb-6 text-white min-h-[150px] resize-none"></textarea>
-            <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 italic text-emerald-400 font-mono">
-            <div class="flex gap-4 mb-10">
-                <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white tracking-widest">🎙️ Voice</button>
-                <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
-                <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white tracking-widest">📎 Files</button>
-            </div>
-            <div id="filePreview" class="mb-6 hidden text-[10px] text-emerald-500 font-mono italic text-center uppercase tracking-widest"></div>
+        <textarea id="mainInput" placeholder="Recording..." class="bg-transparent border-b border-white/10 w-full py-6 text-2xl outline-none mb-6 text-white min-h-[150px] resize-none"></textarea>
+        <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 italic text-emerald-400 font-mono">
+        <div class="flex gap-4 mb-10">
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
+            <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 Files</button>
         </div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-[2.5rem] font-black shadow-2xl text-white uppercase tracking-widest">Transmit to Cloud</button>
-        <button onclick="closeModal()" class="mt-10 text-gray-600 text-[10px] uppercase font-black text-center tracking-widest">Dismiss</button>
+        <div id="filePreview" class="mb-6 hidden text-[10px] text-emerald-500 font-mono italic text-center uppercase"></div>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-[2.5rem] font-black shadow-2xl text-white uppercase tracking-widest">Transmit</button>
+        <button onclick="closeModal()" class="mt-10 text-gray-600 text-[10px] uppercase font-black text-center underline">Dismiss</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 bg-black/98 p-6 z-[120] flex flex-col">
-        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Query</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black uppercase tracking-widest underline">Close</button></div>
+        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Query</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black uppercase underline">Chiudi</button></div>
         <div id="searchBar" class="flex gap-4 mb-8">
-            <input type="text" id="searchInput" placeholder="Search..." class="bg-transparent border-b border-emerald-500 flex-1 py-4 text-2xl outline-none text-white">
+            <input type="text" id="searchInput" placeholder="Cerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-4 text-2xl outline-none text-white">
             <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-4 text-2xl outline-none text-emerald-500 font-mono">
-            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-8 py-4 rounded-2xl font-black uppercase text-white">Go</button>
+            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-8 py-4 rounded-2xl font-black uppercase text-white">Vai</button>
         </div>
-        <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10 space-y-4"><div class="loader"></div><p class="text-[9px] text-emerald-500 uppercase tracking-[0.3em] animate-pulse font-black">Syncing...</p></div>
+        <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10 space-y-4"><div class="loader"></div><p class="text-[9px] text-emerald-500 uppercase animate-pulse font-black">Syncing...</p></div>
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-6 pb-20"></div>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzF6KLCZkpsZuXXd4Hwg0u3erJibgKwJ6Bd8IkpYG8O8u60bIFMHuvohT4zpkVHorhe/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbxiKZHkOW2v6YZWQBvCaKCZyOTne15CWZ9PfVc-Rbc0UKm9tTDTkGbTRAKGqC7ASTIL/exec"; 
         const ANNI_VALIDI = ["1958", "1992"]; 
 
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let authChiaveUsata = ""; let currentModulo = ""; let attachedFiles = []; let searchTimeout;
         let searchMode = "text";
 
-        // Matrix Background Effect
+        // Matrix Background
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const columns = canvas.width / 20;
-        const drops = Array(Math.floor(columns)).fill(1);
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const columns = canvas.width / 20; const drops = Array(Math.floor(columns)).fill(1);
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#059669';
-            ctx.font = '15px monospace';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#059669'; ctx.font = '15px monospace';
             drops.forEach((y, i) => {
                 const text = String.fromCharCode(Math.random() * 128);
                 ctx.fillText(text, i * 20, y * 20);
@@ -151,19 +143,17 @@
         }
 
         function accessSystem() {
-            hapticFeedback();
-            const p = document.getElementById('pinSys').value; if(!p) return;
-            document.getElementById('btnSys').innerText = "CONNECTING...";
+            hapticFeedback(); const p = document.getElementById('pinSys').value; if(!p) return;
+            document.getElementById('btnSys').innerText = "VERIFICA...";
             const script = document.createElement('script');
             script.src = `${API_URL}?azione=PING&pin=${p}&callback=handleLoginResponse`;
             document.body.appendChild(script);
         }
 
         function handleLoginResponse(res) {
-            document.getElementById('btnSys').innerText = "ACCESS VAULT";
+            document.getElementById('btnSys').innerText = "SBLOCCA";
             if(res.status === "OK") {
-                hapticFeedback('success');
-                pinSistema = document.getElementById('pinSys').value;
+                hapticFeedback('success'); pinSistema = document.getElementById('pinSys').value;
                 localStorage.setItem('sap_pin_sys', pinSistema);
                 document.getElementById('layerSystem').classList.add('hidden');
                 document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
@@ -171,24 +161,22 @@
         }
 
         function requestAuth(mod) {
-            hapticFeedback();
-            currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
+            hapticFeedback(); currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authTitle').innerText = mod;
-            document.getElementById('authDesc').innerText = (mod === 'Spesa') ? "Family Access Protocol" : "Admin Identification";
         }
 
         function confirmAuth() {
-            hapticFeedback();
-            const val = document.getElementById('authInput').value; if(!val) return;
-            if(currentModulo === 'Spesa' && !ANNI_VALIDI.includes(val)) return alert("Denied.");
+            hapticFeedback(); const val = document.getElementById('authInput').value; if(!val) return;
+            if(currentModulo === 'Spesa' && !ANNI_VALIDI.includes(val)) return alert("Negato.");
             authChiaveUsata = val; document.getElementById('layerAuth').classList.add('hidden'); openModal(currentModulo);
         }
 
-        function openModal(name) { document.getElementById('modalTitle').innerText = name; document.getElementById('modalInput').classList.remove('hidden'); }
+        function openModal(name) { document.getElementById('modalTitle').innerText = name.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
         function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; document.getElementById('mainInput').value = ""; document.getElementById('tagInput').value = ""; }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
-        function openSearch() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "Text Search"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
-        function openCalendarSearch() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "Date Archive"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+        
+        function openSearch() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "Testo"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+        function openCalendarSearch() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "Calendario"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); document.getElementById('searchResults').innerHTML = ""; }
 
         function runSearch() {
@@ -204,32 +192,27 @@
 
         function handleSearchResponse(res) {
             document.getElementById('searchLoading').classList.add('hidden');
-            document.getElementById('searchBtn').disabled = false;
             const div = document.getElementById('searchResults');
-            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center text-gray-600 text-[10px] uppercase tracking-widest py-20'>No records found</p>"; return; }
-            div.innerHTML = res.map(r => `<div class="glass p-6 rounded-3xl border-l-4 border-emerald-500"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-2 uppercase tracking-widest"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white mb-4">${r.info}</div>${r.link ? `<a href="${r.link}" target="_blank" class="text-[9px] bg-emerald-500/10 p-3 rounded-xl block text-center border border-emerald-500/20 font-black uppercase text-emerald-400">Open Archive</a>` : ""}</div>`).join('');
+            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center py-10 opacity-50 uppercase text-[10px]'>Nessun risultato</p>"; return; }
+            div.innerHTML = res.map(r => `<div class="glass p-6 rounded-3xl border-l-4 border-emerald-500"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-2 uppercase"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white mb-4">${r.info}</div>${r.link ? `<a href="${r.link}" target="_blank" class="text-[9px] bg-emerald-500/10 p-3 rounded-xl block text-center border border-emerald-500/20 font-black uppercase text-emerald-400">Apri</a>` : ""}</div>`).join('');
         }
 
         function handleFiles(input) {
             Array.from(input.files).forEach(f => {
                 const reader = new FileReader();
-                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " files attached"; document.getElementById('filePreview').classList.remove('hidden'); };
+                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " allegati."; document.getElementById('filePreview').classList.remove('hidden'); };
                 reader.readAsDataURL(f);
             });
         }
 
         async function sendData() {
-            hapticFeedback();
-            const btn = document.getElementById('sendBtn'); btn.innerText = "TRANSMITTING...";
+            hapticFeedback(); const btn = document.getElementById('sendBtn'); btn.innerText = "INVIO...";
             const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: document.getElementById('mainInput').value, keywords: document.getElementById('tagInput').value, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
             try {
                 const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const result = await resp.json();
-                if(result.result === "success") {
-                    hapticFeedback('success');
-                    btn.innerText = "COMPLETED"; setTimeout(() => { closeModal(); btn.innerText = "TRANSMIT TO CLOUD"; }, 1000);
-                } else { alert("Error: " + result.message); }
-            } catch (e) { alert("Network Error."); }
+                btn.innerText = "COMPLETATO"; hapticFeedback('success');
+                setTimeout(() => { closeModal(); btn.innerText = "Transmit"; }, 1000);
+            } catch (e) { alert("Errore connessione."); }
         }
 
         function playBeep(freq, dur) {
@@ -243,23 +226,17 @@
         }
 
         function startVoice() {
-            hapticFeedback();
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return alert("Speech API Not Found.");
+            hapticFeedback(); const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return alert("Non supportato.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
-            rec.onstart = () => { playBeep(880, 100); btn.classList.add('recording'); btn.innerText = "LISTENING"; };
+            rec.onstart = () => { playBeep(880, 100); btn.classList.add('recording'); btn.innerText = "ASCOLTO..."; };
             rec.onresult = (e) => { 
-                const text = e.results[0][0].transcript; 
-                document.getElementById('mainInput').value = text;
-                // SMART ROUTING LOGIC
-                const words = text.toLowerCase();
-                if(words.includes("comprare") || words.includes("spesa") || words.includes("pane")) {
-                    document.getElementById('tagInput').value = "#auto_spesa";
-                }
+                const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t;
+                if(t.toLowerCase().includes("spesa") || t.toLowerCase().includes("comprare")) document.getElementById('tagInput').value = "#auto_spesa";
             };
-            rec.onend = () => { playBeep(440, 100); btn.classList.remove('recording'); btn.innerText = "VOICE"; hapticFeedback(); };
+            rec.onend = () => { playBeep(440, 100); btn.classList.remove('recording'); btn.innerText = "🎙️ Voice"; hapticFeedback(); };
             rec.start();
         }
-        function resetApp() { hapticFeedback(); localStorage.removeItem('sap_pin_sys'); location.reload(); }
+        function resetApp() { if(confirm("Resettare accesso?")) { localStorage.removeItem('sap_pin_sys'); location.reload(); } }
     </script>
 </body>
 </html>
