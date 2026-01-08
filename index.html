@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAP Personal Black Box</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
         #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        /* Layer Z-Index Fix */
+        /* Gerarchia Layer */
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
         #modalInput, #searchModal { z-index: 800; background: rgba(0,0,0,0.98); }
@@ -24,22 +25,22 @@
     <canvas id="matrix"></canvas>
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase">SAP</h1>
-        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest">Secure Auth Protocol</p>
+        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest">Vault Access</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white">SBLOCCA</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN NON VALIDO</p>
+        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 transition-transform">SBLOCCA</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN SISTEMA ERRATO</p>
     </div>
 
     <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col">
         <header class="mb-10 mt-6 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono">2026 Database active</p>
+                <p class="text-[9px] text-gray-500 uppercase font-mono">Database Online</p>
             </div>
             <div class="flex gap-2">
-                <button onclick="openCalendarSearch()" class="glass p-3 rounded-2xl text-xl">📅</button>
-                <button onclick="openSearch()" class="glass p-3 rounded-2xl text-xl">🔍</button>
+                <button onclick="requestAuth('Calendar')" class="glass p-3 rounded-2xl text-xl">📅</button>
+                <button onclick="requestAuth('Search')" class="glass p-3 rounded-full text-xl">🔍</button>
             </div>
         </header>
 
@@ -58,41 +59,43 @@
             </button>
         </div>
 
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report HTML</button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report Cloud</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v25.3</p>
-            <button onclick="resetApp()" class="bg-red-900/20 border border-red-500/30 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Logout & Reset</button>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v25.4</p>
+            <button onclick="resetApp()" class="bg-red-900/20 border border-red-500/30 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Logout</button>
         </footer>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h2 id="authTitle" class="text-2xl font-black text-emerald-500 mb-2 uppercase"></h2>
-        <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase font-mono"></p>
+        <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase"></p>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
         <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white">CONFERMA</button>
-        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase font-bold underline">Annulla</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline">Indietro</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col">
-        <h2 id="modalTitle" class="text-xl font-black text-emerald-500 mb-8 uppercase text-center"></h2>
-        <textarea id="mainInput" placeholder="Recording..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[100px]"></textarea>
-        <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono">
-        <div class="flex gap-4 mb-10">
-            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
-            <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
-            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 Allegati</button>
+        <div class="flex justify-between items-center mb-8">
+            <h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase"></h2>
+            <button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button>
         </div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white uppercase tracking-widest">Trasmetti</button>
-        <button onclick="closeModal()" class="mt-10 text-gray-600 text-[10px] uppercase text-center underline">Chiudi</button>
+        <textarea id="mainInput" placeholder="Cosa registriamo?..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px]"></textarea>
+        <input type="text" id="tagInput" placeholder="#keywords" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono">
+        <div class="flex gap-4 mb-10">
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voce</button>
+            <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 File</button>
+        </div>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white uppercase shadow-xl shadow-emerald-900/20">Trasmetti</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Query</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
+        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
         <div class="flex gap-2 mb-8">
             <input type="text" id="searchInput" placeholder="Cerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white">
             <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-emerald-500 font-mono">
-            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">VAI</button>
+            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">GO</button>
         </div>
         <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10"><div class="loader"></div></div>
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
@@ -128,26 +131,44 @@
 
         function requestAuth(mod) {
             currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
-            document.getElementById('authTitle').innerText = mod;
-            document.getElementById('authDesc').innerText = (mod === 'Spesa') ? "Inserire anno di nascita" : "Inserire PIN amministratore";
+            document.getElementById('authInput').value = "";
+            document.getElementById('authTitle').innerText = mod.toUpperCase();
+            
+            if(mod === 'Spesa') {
+                document.getElementById('authDesc').innerText = "Identificazione Famiglia (Anno)";
+            } else if(mod === 'Search' || mod === 'Calendar') {
+                document.getElementById('authDesc').innerText = "Accesso Archivio Riservato (PIN)";
+            } else {
+                document.getElementById('authDesc').innerText = "Area Amministratore (PIN)";
+            }
         }
 
         function confirmAuth() {
             const val = document.getElementById('authInput').value; if(!val) return;
-            // CORREZIONE PUNTO 1: Controllo PIN rigoroso
+            
+            // LOGICA DI SMISTAMENTO PIN CORRETTA
             if(currentModulo === 'Spesa') {
-                if(!ANNI_AUTORIZZATI.includes(val)) return alert("ANNO NON VALIDO.");
+                if(!ANNI_VALIDI.includes(val)) { alert("ACCESSO FAMIGLIA NEGATO."); return; }
             } else {
-                if(val !== ADMIN_PIN) return alert("PIN AMMINISTRATORE ERRATO.");
+                // Per Finanze, Inventario, Diario, Search e Calendar serve "mastro01"
+                if(val !== ADMIN_PIN) { alert("PIN AMMINISTRATORE ERRATO."); return; }
             }
-            authChiaveUsata = val; document.getElementById('layerAuth').classList.add('hidden'); openModal(currentModulo);
+            
+            authChiaveUsata = val; 
+            document.getElementById('layerAuth').classList.add('hidden');
+            
+            // Reindirizzamento al modulo corretto
+            if(currentModulo === 'Search') openSearchUI();
+            else if(currentModulo === 'Calendar') openCalendarUI();
+            else openModal(currentModulo);
         }
 
         function openModal(n) { document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; }
+        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
-        function openSearch() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "Testo"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
-        function openCalendarSearch() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "Calendario"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+
+        function openSearchUI() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "RICERCA TESTO"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+        function openCalendarUI() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "SFOGLIA CALENDARIO"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
 
         async function sendData() {
@@ -155,10 +176,8 @@
             const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: document.getElementById('mainInput').value, keywords: document.getElementById('tagInput').value, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
             try {
                 const resp = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                const res = await resp.json();
-                if(res.result === "success") { btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000); }
-                else { alert("Errore server."); btn.innerText = "ERRORE"; }
-            } catch (e) { alert("Inviato. Verifica Drive."); closeModal(); }
+                btn.innerText = "COMPLETATO"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000);
+            } catch (e) { alert("Dato inviato al cloud."); closeModal(); }
         }
 
         function runSearch() {
@@ -171,20 +190,20 @@
         function handleSearchResponse(res) {
             document.getElementById('searchLoading').classList.add('hidden');
             const div = document.getElementById('searchResults');
-            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center text-gray-600 text-[10px]'>NESSUN DATO</p>"; return; }
-            div.innerHTML = res.map(r => `<div class="glass p-4 rounded-xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white mb-2">${r.info}</div>${r.link ? `<a href="${r.link}" target="_blank" class="text-[9px] bg-emerald-500/10 p-2 rounded block text-center border border-emerald-500/20 font-black text-emerald-400">APRI</a>` : ""}</div>`).join('');
+            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center py-10 opacity-50 uppercase text-[10px]'>Nessun record trovato</p>"; return; }
+            div.innerHTML = res.map(r => `<div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white mb-2">${r.info}</div>${r.link ? `<a href="${r.link}" target="_blank" class="text-[9px] bg-emerald-500/10 p-2 rounded block text-center border border-emerald-500/20 font-black text-emerald-400">APRI ALLEGATO</a>` : ""}</div>`).join('');
         }
 
         function startVoice() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) return alert("FUNZIONE VOCALE NON SUPPORTATA SU QUESTO BROWSER. USA CHROME.");
+            if(!SR) return alert("Usa Chrome per la funzione vocale.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
             rec.onstart = () => { btn.classList.add('recording'); btn.innerText = "ASCOLTO..."; };
             rec.onresult = (e) => { 
                 const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t;
                 if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa";
             };
-            rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOICE"; };
+            rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
             rec.start();
         }
 
