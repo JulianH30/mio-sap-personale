@@ -10,13 +10,24 @@
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        
+        /* Spinner Animato Enterprise */
+        .loader {
+            border: 2px solid rgba(16, 185, 129, 0.1);
+            border-top: 2px solid #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col">
 
     <div id="layerSystem" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-8">
         <h1 class="text-2xl font-bold text-emerald-500 mb-2">SISTEMA SAP</h1>
-        <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-widest">Identificazione Richiesta</p>
+        <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-widest text-center">Security Protocol Active</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-10 tracking-[0.5em]">
         <button onclick="accessSystem()" class="w-full bg-emerald-600 p-5 rounded-2xl font-black btn-active">ACCEDI</button>
     </div>
@@ -26,12 +37,12 @@
         <p id="authDesc" class="text-[10px] text-gray-500 mb-8 text-center uppercase"></p>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-10 tracking-[0.3em]">
         <button onclick="validateAuth()" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold btn-active uppercase">Conferma</button>
-        <button onclick="closeAuth()" class="mt-8 text-gray-700 text-[10px] uppercase underline tracking-widest">Annulla</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-700 text-[10px] uppercase underline tracking-widest font-bold">Annulla</button>
     </div>
 
     <div id="appContent" class="opacity-0 transition-opacity duration-500 flex-grow flex flex-col">
         <header class="mb-8 mt-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-white tracking-tighter">PERSONAL <span class="text-emerald-500 font-black">SAP</span></h1>
+            <h1 class="text-2xl font-bold text-white tracking-tighter uppercase italic">SAP <span class="text-emerald-500 font-black">Hysenji</span></h1>
             <button onclick="openSearch()" class="glass p-3 rounded-full text-xl border-emerald-500/20">🔍</button>
         </header>
 
@@ -46,16 +57,16 @@
             <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase"><span>Dal:</span><input type="date" id="dateStart" class="bg-transparent text-emerald-500 outline-none"></div>
             <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase"><span>Al:</span><input type="date" id="dateEnd" class="bg-transparent text-emerald-500 outline-none"></div>
         </div>
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black uppercase text-[10px] tracking-widest">🚀 Esporta Periodo</button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black uppercase text-[10px] tracking-widest btn-active">🚀 Esporta Report HTML</button>
 
         <footer class="mt-auto pb-6 text-center">
-            <p class="text-[10px] text-gray-700 font-mono tracking-widest uppercase italic">Dev-Designer Hysenji • v22.0</p>
-            <button onclick="resetApp()" class="text-[8px] text-gray-900 mt-2 underline">RESET PIN</button>
+            <p class="text-[10px] text-gray-700 font-mono tracking-widest uppercase italic">Dev-Designer Hysenji • Enterprise v23.0</p>
+            <button onclick="resetApp()" class="text-[8px] text-gray-900 mt-2 underline">LOGOUT SISTEMA</button>
         </footer>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 bg-black bg-opacity-95 p-6 z-[100] flex flex-col">
-        <h2 id="modalTitle" class="text-xl font-bold text-emerald-500 mb-6 uppercase tracking-tighter"></h2>
+        <h2 id="modalTitle" class="text-xl font-bold text-emerald-500 mb-6 uppercase tracking-widest"></h2>
         <input type="text" id="mainInput" placeholder="Inserisci dato..." class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-4">
         <input type="text" id="tagInput" placeholder="Tag / Parole chiave..." class="bg-transparent border-b border-gray-800 w-full py-2 text-sm outline-none mb-8 italic text-emerald-400">
         <div class="flex gap-4 mb-6">
@@ -64,19 +75,32 @@
             <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800 uppercase">📎 Allegati</button>
         </div>
         <div id="filePreview" class="mb-6 hidden text-[10px] text-emerald-500 font-mono italic"></div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black shadow-lg">TRASMETTI</button>
-        <button onclick="closeModal()" class="mt-10 text-gray-500 text-xs uppercase underline">Chiudi</button>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black shadow-lg">TRASMETTI AL CLOUD</button>
+        <button onclick="closeModal()" class="mt-10 text-gray-500 text-xs uppercase underline font-bold">Chiudi Finestra</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 bg-black bg-opacity-98 p-6 z-[120] flex flex-col">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-emerald-500 uppercase tracking-widest">Ricerca Globale</h2><button onclick="closeSearch()" class="text-gray-500 text-xs underline">CHIUDI</button></div>
-        <div class="flex gap-2 mb-6"><input type="text" id="searchInput" placeholder="Cosa cerchi?" class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none"><button onclick="runSearch()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold uppercase">Vai</button></div>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-emerald-500 uppercase tracking-widest">Ricerca Globale</h2>
+            <button onclick="closeSearch()" class="text-gray-500 text-xs underline font-bold">CHIUDI</button>
+        </div>
+        
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="searchInput" placeholder="Cosa cerchi?" class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none">
+            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold uppercase btn-active">Vai</button>
+        </div>
+
+        <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10 space-y-4">
+            <div class="loader"></div>
+            <p class="text-[10px] text-emerald-500 uppercase tracking-[0.2em] animate-pulse">Interrogazione database in corso...</p>
+        </div>
+
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
     <script>
-        // --- CONFIGURAZIONE (MODIFICA SOLO QUI) ---
-        const ANNI_AUTORIZZATI = ["1958", "1992"]; // METTI GLI STESSI ANNI DI APPS SCRIPT
+        // --- CONFIGURAZIONE (SINCRONIZZA CON GOOGLE) ---
+        const ANNI_AUTORIZZATI = ["1992", "1958"]; 
         const PIN_ADMIN_FISSO = "admin01";
         const API_URL = "https://script.google.com/macros/s/AKfycbxcAzx8V7CpSCb_48TTCIgD_YSGZsz_p7DS9kcCCW_2neSzNL2qLvTyTYOyEnBUMX-_/exec"; 
 
@@ -100,11 +124,11 @@
             document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authInput').value = "";
             if(mod === 'Spesa') {
-                document.getElementById('authTitle').innerText = "Accesso Familiare";
-                document.getElementById('authDesc').innerText = "Inserire anno di nascita";
+                document.getElementById('authTitle').innerText = "Accesso Spesa";
+                document.getElementById('authDesc').innerText = "Inserire anno di nascita autorizzato";
             } else {
-                document.getElementById('authTitle').innerText = "Area Protetta";
-                document.getElementById('authDesc').innerText = "Inserire PIN Admin";
+                document.getElementById('authTitle').innerText = "Area Riservata";
+                document.getElementById('authDesc').innerText = "Autenticazione Admin Richiesta";
             }
         }
 
@@ -115,18 +139,18 @@
                     authChiaveUsata = val;
                     document.getElementById('layerAuth').classList.add('hidden');
                     openModal('Spesa');
-                } else { alert("Anno non riconosciuto."); }
+                } else { alert("Accesso Negato: Anno non autorizzato."); }
             } else {
                 if(val === PIN_ADMIN_FISSO) {
                     authChiaveUsata = val;
                     document.getElementById('layerAuth').classList.add('hidden');
                     openModal(currentModulo);
-                } else { alert("PIN Errato."); }
+                } else { alert("Accesso Negato: PIN Admin Errato."); }
             }
         }
 
         function openModal(name) { document.getElementById('modalTitle').innerText = name.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; document.getElementById('mainInput').value = ""; document.getElementById('tagInput').value = ""; }
+        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; document.getElementById('filePreview').innerHTML = ""; document.getElementById('mainInput').value = ""; document.getElementById('tagInput').value = ""; }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
         function openSearch() { document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); document.getElementById('searchResults').innerHTML = ""; }
@@ -134,42 +158,79 @@
         function handleFiles(input) {
             Array.from(input.files).forEach(f => {
                 const reader = new FileReader();
-                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " allegati."; document.getElementById('filePreview').classList.remove('hidden'); };
+                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " allegati pronti."; document.getElementById('filePreview').classList.remove('hidden'); };
                 reader.readAsDataURL(f);
             });
         }
 
         async function sendData() {
-            const btn = document.getElementById('sendBtn'); btn.innerText = "INVIO...";
+            const btn = document.getElementById('sendBtn'); btn.innerText = "TRASMISSIONE IN CORSO...";
+            btn.disabled = true;
             const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: document.getElementById('mainInput').value, keywords: document.getElementById('tagInput').value, files: attachedFiles };
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            btn.innerText = "TRASMESSO"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000);
+            btn.innerText = "COMPLETATO"; 
+            setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; btn.disabled = false; }, 1000);
         }
 
         async function triggerExport() {
             const s = document.getElementById('dateStart').value, e = document.getElementById('dateEnd').value;
-            if(!s || !e) return alert("Scegli le date.");
+            if(!s || !e) return alert("Definire l'intervallo date.");
             const fmt = (d) => d.split('-').reverse().join('/');
+            const btn = document.getElementById('exportBtn'); btn.innerText = "ELABORAZIONE REPORT...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ pinSistema: pinSistema, authChiave: PIN_ADMIN_FISSO, azione: "GENERA_REPORT", dataInizio: fmt(s), dataFine: fmt(e) })});
-            alert("Export salvato.");
+            btn.innerText = "✅ REPORT DISPONIBILE IN DRIVE"; 
+            setTimeout(() => btn.innerText = "🚀 Esporta Report HTML", 3000);
         }
 
+        // --- RICERCA CON FEEDBACK VISIVO ---
         function runSearch() {
             const q = document.getElementById('searchInput').value;
+            if(!q) return;
+
+            // 1. UI Loading State
+            document.getElementById('searchResults').innerHTML = "";
+            document.getElementById('searchLoading').classList.remove('hidden');
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.disabled = true;
+            searchBtn.classList.add('opacity-50');
+
+            // 2. Esecuzione
             const script = document.createElement('script');
             script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(q)}&pin=${pinSistema}&callback=handleSearchResponse`;
             document.body.appendChild(script);
         }
 
         function handleSearchResponse(res) {
+            // 1. Rimuovi Loading State
+            document.getElementById('searchLoading').classList.add('hidden');
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.disabled = false;
+            searchBtn.classList.remove('opacity-50');
+
             const div = document.getElementById('searchResults');
-            div.innerHTML = res.map(r => `<div class="glass p-4 rounded-xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[9px] text-emerald-500 font-bold mb-1"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold">${r.info}</div></div>`).join('');
+            
+            if(!res || res.length === 0) {
+                div.innerHTML = `<div class="text-center py-10 text-gray-500 text-xs uppercase tracking-widest">Nessuna corrispondenza trovata nel database.</div>`;
+                return;
+            }
+
+            // 2. Rendering Risultati
+            div.innerHTML = res.map(r => `
+                <div class="glass p-4 rounded-xl border-l-4 border-emerald-500 mb-3 animate-fade-in">
+                    <div class="flex justify-between text-[9px] text-emerald-500 font-bold mb-1 uppercase tracking-tighter">
+                        <span>${r.modulo}</span>
+                        <span>${r.data}</span>
+                    </div>
+                    <div class="text-sm font-bold text-white mb-2">${r.info}</div>
+                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[10px] bg-emerald-900/30 p-2 rounded block text-center border border-emerald-500/20 font-bold text-emerald-400">👁️ APRI ALLEGATO</a>` : ""}
+                </div>`).join('');
         }
 
         function resetApp() { localStorage.removeItem('sap_pin_sys'); location.reload(); }
+        
         function startVoice() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechRecognition) return alert("Non supportato.");
+            if(!SpeechRecognition) return alert("Browser non supportato.");
             const rec = new SpeechRecognition(); rec.lang = 'it-IT';
             rec.onresult = (e) => { document.getElementById('mainInput').value = e.results[0][0].transcript; };
             rec.start();
