@@ -1,0 +1,17 @@
+{
+  "name": "Personal SAP",
+  "short_name": "SAP",
+  "description": "Secure Authentication Protocol Enterprise",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/nolan/512/security-configuration.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
