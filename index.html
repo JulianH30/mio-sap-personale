@@ -8,9 +8,8 @@
     <meta name="theme-color" content="#10b981">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
         #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
@@ -22,6 +21,8 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Animazione Brain */
+        .brain-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); border: 1px solid #10b981 !important; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col">
@@ -29,18 +30,18 @@
     <canvas id="matrix"></canvas>
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
+        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase">SAP</h1>
         <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest">Vault Access</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
         <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 transition-transform">SBLOCCA</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN SISTEMA ERRATO</p>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN ERRATO</p>
     </div>
 
     <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col">
         <header class="mb-10 mt-6 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono">Database Online</p>
+                <p class="text-[9px] text-gray-500 uppercase font-mono">Mind Interface v26.1</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="requestAuth('Calendar')" class="glass p-3 rounded-2xl text-xl">📅</button>
@@ -49,16 +50,16 @@
         </header>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
-            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center">
+            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
                 <span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400">Finanze</span>
             </button>
-            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center">
+            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
                 <span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400">Diario</span>
             </button>
-            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center">
+            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
                 <span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400">Inventario</span>
             </button>
-            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30">
+            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95 transition-all">
                 <span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black">Spesa</span>
             </button>
         </div>
@@ -66,56 +67,51 @@
         <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report Cloud</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v26.0</p>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v26.1 BRAIN</p>
             <button onclick="resetApp()" class="bg-red-900/20 border border-red-500/30 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Logout</button>
         </footer>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h2 id="authTitle" class="text-2xl font-black text-emerald-500 mb-2 uppercase"></h2>
-        <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase"></p>
+        <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase font-mono"></p>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
         <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white">CONFERMA</button>
         <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline">Indietro</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-8">
-            <h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase"></h2>
-            <button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button>
-        </div>
-        <textarea id="mainInput" placeholder="Cosa registriamo?..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px]"></textarea>
+        <div class="flex justify-between items-center mb-8"><h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase"></h2><button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button></div>
+        <textarea id="mainInput" placeholder="Recording..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px] resize-none"></textarea>
         <input type="text" id="tagInput" placeholder="#keywords" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono">
         <div class="flex gap-4 mb-10">
-            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voce</button>
+            <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
             <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 File</button>
         </div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white uppercase shadow-xl shadow-emerald-900/20">Trasmetti</button>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white uppercase">Trasmetti</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
-        <div class="flex gap-2 mb-8">
-            <input type="text" id="searchInput" placeholder="Cerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white">
-            <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-emerald-500 font-mono">
-            <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">GO</button>
+        <div class="flex justify-between items-center mb-10">
+            <h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Archive</h2>
+            <button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button>
+        </div>
+        <div id="searchBar" class="flex flex-col gap-4 mb-8">
+            <div class="flex gap-2">
+                <input type="text" id="searchInput" placeholder="Chiedi al cervello (es. 'ieri')..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:brain-glow transition-all">
+                <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-emerald-500 font-mono">
+                <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">VAI</button>
+            </div>
+            <div id="brainFeedback" class="text-[9px] text-emerald-500/60 font-mono uppercase italic px-2"></div>
         </div>
         <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10"><div class="loader"></div></div>
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
     <script>
-        // REGISTRAZIONE SERVICE WORKER
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js').then(registration => {
-                    console.log('SW registrato con successo:', registration.scope);
-                }, err => {
-                    console.log('Registrazione SW fallita:', err);
-                });
-            });
-        }
+        // PWA REGISTRATION
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js'); }); }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbyCHkF9XhVytzPgwnOgZNnGSKp7AcSXiThUrnZ5GxqORaHBo97q_E0KHKnJCZGf5X0/exec"; 
         const ANNI_VALIDI = ["1958", "1992"]; 
@@ -127,11 +123,38 @@
 
         if(pinSistema) { document.getElementById('layerSystem').classList.add('hidden'); document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100'); }
 
+        // Matrix Effect
         const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const columns = canvas.width / 20; const drops = Array(Math.floor(columns)).fill(1);
         function drawMatrix() { ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#059669'; ctx.font = '15px monospace'; drops.forEach((y, i) => { const text = String.fromCharCode(Math.random()*128); ctx.fillText(text, i*20, y*20); if(y*20 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }); }
         setInterval(drawMatrix, 50);
+
+        // --- THE BRAIN PARSER (LOGICA v26.1) ---
+        function sapMindParser(query) {
+            let q = query.toLowerCase().trim();
+            const feedback = document.getElementById('brainFeedback');
+            const now = new Date();
+            
+            const formatDate = (date) => {
+                let d = date.getDate().toString().padStart(2, '0');
+                let m = (date.getMonth() + 1).toString().padStart(2, '0');
+                let y = date.getFullYear();
+                return `${d}/${m}/${y}`;
+            };
+
+            // Logica Tempo
+            if (q === "oggi") { feedback.innerText = "Interrogazione data odierna..."; return formatDate(now); }
+            if (q === "ieri") { 
+                let d = new Date(); d.setDate(d.getDate() - 1);
+                feedback.innerText = "Interrogazione data di ieri...";
+                return formatDate(d);
+            }
+            if (q.includes("settimana")) { feedback.innerText = "Scansione ultimi 7 giorni..."; return ""; /* Espandibile in v27 */ }
+            
+            feedback.innerText = "Scansione testo libera...";
+            return query;
+        }
 
         function accessSystem() {
             const p = document.getElementById('pinSys').value; if(!p) return;
@@ -163,8 +186,8 @@
         function openModal(n) { document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
         function closeModal() { document.getElementById('modalInput').classList.add('hidden'); }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
-        function openSearchUI() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "RICERCA TESTO"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
-        function openCalendarUI() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "SFOGLIA CALENDARIO"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+        function openSearchUI() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "SAP MIND SEARCH"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
+        function openCalendarUI() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "ARCHIVIO CALENDARIO"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
 
         async function sendData() {
@@ -177,8 +200,12 @@
         }
 
         function runSearch() {
-            let q = (searchMode === "text") ? document.getElementById('searchInput').value : document.getElementById('searchDateInput').value.split('-').reverse().join('/');
-            if(!q) return;
+            let rawQ = (searchMode === "text") ? document.getElementById('searchInput').value : document.getElementById('searchDateInput').value.split('-').reverse().join('/');
+            if(!rawQ) return;
+            
+            // IL CERVELLO ANALIZZA LA QUERY
+            let q = (searchMode === "text") ? sapMindParser(rawQ) : rawQ;
+
             document.getElementById('searchResults').innerHTML = ""; document.getElementById('searchLoading').classList.remove('hidden');
             const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(q)}&pin=${pinSistema}&callback=handleSearchResponse`; document.body.appendChild(script);
         }
@@ -192,10 +219,15 @@
 
         function startVoice() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) return alert("Usa Chrome per la funzione vocale.");
+            if(!SR) return alert("Usa Chrome.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
             rec.onstart = () => { btn.classList.add('recording'); btn.innerText = "ASCOLTO..."; };
-            rec.onresult = (e) => { const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t; if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa"; };
+            rec.onresult = (e) => { 
+                const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t; 
+                // BRAIN INPUT SMART TAGGING
+                if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa";
+                if(t.toLowerCase().includes("euro") || t.toLowerCase().includes("pagato")) document.getElementById('tagInput').value += " #finanza_detect";
+            };
             rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
             rec.start();
         }
@@ -211,4 +243,4 @@
         function resetApp() { localStorage.removeItem('sap_pin_sys'); location.reload(); }
     </script>
 </body>
-</html>
+</html>f
