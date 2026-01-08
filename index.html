@@ -6,60 +6,61 @@
     <title>SAP Personal Black Box</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
+        body { background-color: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .btn-active:active { transform: scale(0.95); transition: 0.1s; }
+        .recording { animation: pulse 1s infinite; background-color: #ef4444 !important; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col">
 
     <div id="layerSystem" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-8">
-        <h1 class="text-2xl font-bold text-emerald-500 mb-2">SISTEMA SAP</h1>
-        <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-widest">Inserire PIN Generale</p>
-        <input type="password" id="pinSys" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-8">
-        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold btn-active">ACCEDI</button>
+        <h1 class="text-3xl font-bold text-emerald-500 mb-2">SISTEMA SAP</h1>
+        <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-widest text-center">Identificazione Necessaria</p>
+        <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-10 tracking-[0.5em]">
+        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-5 rounded-2xl font-black btn-active">ACCEDI</button>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black z-[150] flex flex-col items-center justify-center p-8">
         <h2 id="authTitle" class="text-xl font-bold text-emerald-500 mb-2 uppercase tracking-widest"></h2>
-        <p id="authDesc" class="text-[10px] text-gray-500 mb-8 text-center"></p>
-        <input type="password" id="authInput" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-8">
-        <button onclick="validateAuth()" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold btn-active">CONFERMA</button>
-        <button onclick="closeAuth()" class="mt-4 text-gray-600 text-xs">ANNULLA</button>
+        <p id="authDesc" class="text-[10px] text-gray-500 mb-8 text-center uppercase"></p>
+        <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-10 tracking-[0.3em]">
+        <button onclick="validateAuth()" class="w-full bg-emerald-600 p-5 rounded-2xl font-bold btn-active uppercase">Conferma</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-700 text-[10px] uppercase underline tracking-widest">Annulla</button>
     </div>
 
-    <div id="appContent" class="opacity-0 transition-opacity duration-500 flex-grow">
+    <div id="appContent" class="opacity-0 transition-opacity duration-500 flex-grow flex flex-col">
         <header class="mb-8 mt-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-white tracking-tighter">PERSONAL <span class="text-emerald-500">SAP</span></h1>
-            <button onclick="openSearch()" class="glass p-3 rounded-full text-xl">🔍</button>
+            <h1 class="text-2xl font-bold text-white tracking-tighter">PERSONAL <span class="text-emerald-500 font-black">SAP</span></h1>
+            <button onclick="openSearch()" class="glass p-3 rounded-full text-xl border-emerald-500/20">🔍</button>
         </header>
 
         <div class="grid grid-cols-2 gap-4 mb-8">
             <button onclick="requestAuth('Finanze')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-                <span class="text-3xl mb-2">💰</span><span class="text-xs uppercase font-bold">Finanze</span>
+                <span class="text-3xl mb-2">💰</span><span class="text-xs uppercase font-bold tracking-widest">Finanze</span>
             </button>
             <button onclick="requestAuth('Diario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-                <span class="text-3xl mb-2">✍️</span><span class="text-xs uppercase font-bold">Diario</span>
+                <span class="text-3xl mb-2">✍️</span><span class="text-xs uppercase font-bold tracking-widest">Diario</span>
             </button>
             <button onclick="requestAuth('Inventario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active">
-                <span class="text-3xl mb-2">📦</span><span class="text-xs uppercase font-bold">Inventario</span>
+                <span class="text-3xl mb-2">📦</span><span class="text-xs uppercase font-bold tracking-widest">Inventario</span>
             </button>
-            <button onclick="requestAuth('Spesa')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active border border-emerald-500/40 shadow-lg shadow-emerald-500/10">
+            <button onclick="requestAuth('Spesa')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active border border-emerald-500/40">
                 <span class="text-3xl mb-2">🛒</span><span class="text-xs uppercase text-emerald-500 font-black">Spesa Casa</span>
             </button>
         </div>
 
         <div class="glass p-4 rounded-xl space-y-3 border border-emerald-500/10 mb-4">
-            <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Esportazione Periodo</h3>
-            <div class="flex justify-between items-center text-xs"><span class="text-gray-500">DA:</span><input type="date" id="dateStart" class="bg-transparent text-emerald-500 outline-none"></div>
-            <div class="flex justify-between items-center text-xs"><span class="text-gray-500">A:</span><input type="date" id="dateEnd" class="bg-transparent text-emerald-500 outline-none"></div>
+            <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase"><span>Dal:</span><input type="date" id="dateStart" class="bg-transparent text-emerald-500 outline-none"></div>
+            <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 uppercase"><span>Al:</span><input type="date" id="dateEnd" class="bg-transparent text-emerald-500 outline-none"></div>
         </div>
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black uppercase text-[10px] tracking-widest btn-active">🚀 Genera Export Periodico</button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-2xl text-emerald-500 font-black uppercase text-[10px] tracking-widest">🚀 Genera Export</button>
 
-        <footer class="mt-auto pb-6 pt-10 text-center">
-            <p class="text-[10px] text-gray-700 font-mono uppercase tracking-[0.2em]">Dev-Designer Hysenji • v20.0</p>
-            <button onclick="resetApp()" class="text-[8px] text-gray-800 mt-2">RESET SISTEMA</button>
+        <footer class="mt-auto pb-6 text-center">
+            <p class="text-[10px] text-gray-700 font-mono tracking-widest uppercase italic">Dev-Designer Hysenji • v21.1</p>
+            <button onclick="resetApp()" class="text-[8px] text-gray-900 mt-2 underline">RESET PIN</button>
         </footer>
     </div>
 
@@ -67,19 +68,19 @@
         <h2 id="modalTitle" class="text-xl font-bold text-emerald-500 mb-6 uppercase"></h2>
         <input type="text" id="mainInput" placeholder="Inserisci dato..." class="bg-transparent border-b border-gray-800 w-full py-6 text-2xl outline-none mb-4">
         <input type="text" id="tagInput" placeholder="Tag / Parole chiave..." class="bg-transparent border-b border-gray-800 w-full py-2 text-sm outline-none mb-8 italic text-emerald-400">
-        <div class="flex gap-4 mb-8">
-            <button onclick="startVoice()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800">🎙️ VOCE</button>
+        <div class="flex gap-4 mb-6">
+            <button onclick="startVoice()" id="voiceBtn" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800">🎙️ VOCE</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
             <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-gray-900 p-4 rounded-xl text-xs font-bold border border-gray-800">📎 ALLEGATI</button>
         </div>
-        <div id="filePreview" class="mb-6 hidden text-[10px] text-emerald-500 font-mono"></div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black shadow-lg">TRASMETTI AL CLOUD</button>
-        <button onclick="closeModal()" class="mt-8 text-gray-500">CHIUDI [X]</button>
+        <div id="filePreview" class="mb-6 hidden text-[10px] text-emerald-500 font-mono italic"></div>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black shadow-lg">TRASMETTI</button>
+        <button onclick="closeModal()" class="mt-10 text-gray-500 text-xs uppercase underline">Chiudi Finestra</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 bg-black bg-opacity-98 p-6 z-[120] flex flex-col">
-        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-emerald-500 uppercase tracking-widest">Ricerca Globale</h2><button onclick="closeSearch()" class="text-gray-500 text-sm">CHIUDI</button></div>
-        <div class="flex gap-2 mb-6"><input type="text" id="searchInput" placeholder="Cosa cerchi?" class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none"><button onclick="runSearch()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold">VAI</button></div>
+        <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-emerald-500 uppercase tracking-widest">Ricerca Globale</h2><button onclick="closeSearch()" class="text-gray-500 text-xs underline">CHIUDI</button></div>
+        <div class="flex gap-2 mb-6"><input type="text" id="searchInput" placeholder="Cosa cerchi?" class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none"><button onclick="runSearch()" class="bg-emerald-600 px-6 py-2 rounded-xl font-bold uppercase">Vai</button></div>
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
@@ -87,9 +88,12 @@
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let adminPin = "";
         let currentModulo = "";
-        const API_URL = "https://script.google.com/macros/s/AKfycbwxUUyvAee6zfq5lzjWMawjkZ506hxvf-I69tkmwGX3bt-18dfgoIfjmdzOeeQ-tfCQ/exec";
-        const ANNI_VALIDI = ["1970", "1975", "2000"];
         let attachedFiles = [];
+        
+        // !!! INSERISCI QUI IL TUO URL DI DEPLOYMENT !!!
+        const API_URL = "https://script.google.com/macros/s/AKfycbw83o2cYw6HMDiV9jMe2yykZhjQBlDRzK3POGDT6ey188wPdQhX4cS5d_H3X9p06acY/exec"; 
+        
+        const ANNI_VALIDI = ["1970", "1975", "2000"];
 
         if(pinSistema) {
             document.getElementById('layerSystem').classList.add('hidden');
@@ -106,11 +110,11 @@
             document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authInput').value = "";
             if(mod === 'Spesa') {
-                document.getElementById('authTitle').innerText = "Accesso Spesa";
-                document.getElementById('authDesc').innerText = "Inserire il tuo ANNO di nascita (es: 1975)";
+                document.getElementById('authTitle').innerText = "Accesso Familiare";
+                document.getElementById('authDesc').innerText = "Identificazione richiesta: inserire anno di nascita";
             } else {
-                document.getElementById('authTitle').innerText = "Area Riservata";
-                document.getElementById('authDesc').innerText = "Inserire il PIN Admin (admin01)";
+                document.getElementById('authTitle').innerText = "Area Protetta";
+                document.getElementById('authDesc').innerText = "Richiesta autorizzazione Admin";
             }
         }
 
@@ -120,25 +124,21 @@
                 if(ANNI_VALIDI.includes(val)) {
                     document.getElementById('layerAuth').classList.add('hidden');
                     openModal('Spesa');
-                } else { alert("Accesso Famiglia Negato."); }
+                } else { alert("Accesso Negato."); }
             } else {
                 if(val === "admin01") {
                     adminPin = val;
                     document.getElementById('layerAuth').classList.add('hidden');
                     openModal(currentModulo);
-                } else { alert("PIN Admin Errato."); }
+                } else { alert("Credenziali Errate."); }
             }
         }
 
-        function openModal(name) {
-            document.getElementById('modalTitle').innerText = name;
-            document.getElementById('modalInput').classList.remove('hidden');
-        }
-
-        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; }
+        function openModal(name) { document.getElementById('modalTitle').innerText = name.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modalInput').classList.add('hidden'); attachedFiles = []; document.getElementById('filePreview').innerHTML = ""; document.getElementById('mainInput').value = ""; document.getElementById('tagInput').value = ""; }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
         function openSearch() { document.getElementById('searchModal').classList.remove('hidden'); }
-        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
+        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); document.getElementById('searchResults').innerHTML = ""; }
 
         function handleFiles(input) {
             Array.from(input.files).forEach(f => {
@@ -147,32 +147,27 @@
                 reader.readAsDataURL(f);
             });
         }
-        function renderPreview() { document.getElementById('filePreview').innerText = attachedFiles.length + " file pronti."; document.getElementById('filePreview').classList.remove('hidden'); }
+        function renderPreview() { document.getElementById('filePreview').innerText = attachedFiles.length + " allegati pronti."; document.getElementById('filePreview').classList.remove('hidden'); }
 
         async function sendData() {
             const btn = document.getElementById('sendBtn'); btn.innerText = "TRASMISSIONE...";
-            const payload = {
-                pinSistema: pinSistema,
-                adminPin: adminPin,
-                modulo: currentModulo,
-                oggetto: document.getElementById('mainInput').value,
-                keywords: document.getElementById('tagInput').value,
-                files: attachedFiles
-            };
+            const payload = { pinSistema: pinSistema, adminPin: adminPin, modulo: currentModulo, oggetto: document.getElementById('mainInput').value, keywords: document.getElementById('tagInput').value, files: attachedFiles };
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            alert("Trasmesso correttamente!"); location.reload();
+            btn.innerText = "COMPLETATO"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000);
         }
 
         async function triggerExport() {
             const s = document.getElementById('dateStart').value, e = document.getElementById('dateEnd').value;
-            if(!s || !e) return alert("Inserisci date.");
+            if(!s || !e) return alert("Scegli le date.");
             const fmt = (d) => d.split('-').reverse().join('/');
+            const btn = document.getElementById('exportBtn'); btn.innerText = "ELABORAZIONE...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ pinSistema: pinSistema, adminPin: "admin01", azione: "GENERA_REPORT", dataInizio: fmt(s), dataFine: fmt(e) })});
-            alert("Export salvato su Drive.");
+            btn.innerText = "✅ EXPORT SALVATO"; setTimeout(() => btn.innerText = "🚀 Esporta Periodo", 3000);
         }
 
         function runSearch() {
-            const q = document.getElementById('searchInput').value;
+            const q = document.getElementById('searchInput').value; if(!q) return;
+            document.getElementById('searchResults').innerHTML = "<p class='text-center animate-pulse text-xs text-gray-500'>Scansione in corso...</p>";
             const script = document.createElement('script');
             script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(q)}&pin=${pinSistema}&callback=handleSearchResponse`;
             document.body.appendChild(script);
@@ -180,16 +175,23 @@
 
         function handleSearchResponse(res) {
             const div = document.getElementById('searchResults');
+            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center text-red-500 text-xs'>Nessun risultato trovato.</p>"; return; }
             div.innerHTML = res.map(r => `
-                <div class="glass p-4 rounded-xl border-l-4 border-emerald-500">
-                    <div class="flex justify-between text-[10px] text-emerald-500 font-bold mb-1"><span>${r.modulo}</span><span>${r.data}</span></div>
+                <div class="glass p-4 rounded-xl border-l-4 border-emerald-500 mb-3">
+                    <div class="flex justify-between text-[9px] text-emerald-500 font-bold mb-1 uppercase"><span>${r.modulo}</span><span>${r.data}</span></div>
                     <div class="text-sm font-bold text-white mb-2">${r.info}</div>
-                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[10px] bg-emerald-900/30 p-2 rounded block text-center border border-emerald-500/20">👁️ APRI</a>` : ""}
+                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[10px] bg-emerald-900/30 p-2 rounded block text-center border border-emerald-500/20 font-bold">👁️ APRI ALLEGATO</a>` : ""}
                 </div>`).join('');
         }
 
+        function startVoice() {
+            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); rec.lang = 'it-IT';
+            const btn = document.getElementById('voiceBtn'); btn.classList.add('recording');
+            rec.onresult = (e) => { document.getElementById('mainInput').value = e.results[0][0].transcript; btn.classList.remove('recording'); };
+            rec.onerror = () => btn.classList.remove('recording');
+            rec.start();
+        }
         function resetApp() { localStorage.removeItem('sap_pin_sys'); location.reload(); }
     </script>
 </body>
 </html>
-
