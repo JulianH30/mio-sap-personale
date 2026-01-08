@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAP Personal Black Box</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
         #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        /* Gerarchia Layer */
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
         #modalInput, #searchModal { z-index: 800; background: rgba(0,0,0,0.98); }
@@ -62,7 +66,7 @@
         <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report Cloud</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v25.4</p>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4">Dev-Designer Hysenji • v26.0</p>
             <button onclick="resetApp()" class="bg-red-900/20 border border-red-500/30 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Logout</button>
         </footer>
     </div>
@@ -102,6 +106,17 @@
     </div>
 
     <script>
+        // REGISTRAZIONE SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').then(registration => {
+                    console.log('SW registrato con successo:', registration.scope);
+                }, err => {
+                    console.log('Registrazione SW fallita:', err);
+                });
+            });
+        }
+
         const API_URL = "https://script.google.com/macros/s/AKfycbyCHkF9XhVytzPgwnOgZNnGSKp7AcSXiThUrnZ5GxqORaHBo97q_E0KHKnJCZGf5X0/exec"; 
         const ANNI_VALIDI = ["1958", "1992"]; 
         const ADMIN_PIN = "mastro01";
@@ -112,7 +127,6 @@
 
         if(pinSistema) { document.getElementById('layerSystem').classList.add('hidden'); document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100'); }
 
-        // Matrix Effect
         const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const columns = canvas.width / 20; const drops = Array(Math.floor(columns)).fill(1);
@@ -133,40 +147,22 @@
             currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authInput').value = "";
             document.getElementById('authTitle').innerText = mod.toUpperCase();
-            
-            if(mod === 'Spesa') {
-                document.getElementById('authDesc').innerText = "Identificazione Famiglia (Anno)";
-            } else if(mod === 'Search' || mod === 'Calendar') {
-                document.getElementById('authDesc').innerText = "Accesso Archivio Riservato (PIN)";
-            } else {
-                document.getElementById('authDesc').innerText = "Area Amministratore (PIN)";
-            }
+            if(mod === 'Spesa') { document.getElementById('authDesc').innerText = "Identificazione Famiglia (Anno)"; } 
+            else if(mod === 'Search' || mod === 'Calendar') { document.getElementById('authDesc').innerText = "Accesso Archivio Riservato (PIN)"; } 
+            else { document.getElementById('authDesc').innerText = "Area Amministratore (PIN)"; }
         }
 
         function confirmAuth() {
             const val = document.getElementById('authInput').value; if(!val) return;
-            
-            // LOGICA DI SMISTAMENTO PIN CORRETTA
-            if(currentModulo === 'Spesa') {
-                if(!ANNI_VALIDI.includes(val)) { alert("ACCESSO FAMIGLIA NEGATO."); return; }
-            } else {
-                // Per Finanze, Inventario, Diario, Search e Calendar serve "mastro01"
-                if(val !== ADMIN_PIN) { alert("PIN AMMINISTRATORE ERRATO."); return; }
-            }
-            
-            authChiaveUsata = val; 
-            document.getElementById('layerAuth').classList.add('hidden');
-            
-            // Reindirizzamento al modulo corretto
-            if(currentModulo === 'Search') openSearchUI();
-            else if(currentModulo === 'Calendar') openCalendarUI();
-            else openModal(currentModulo);
+            if(currentModulo === 'Spesa') { if(!ANNI_VALIDI.includes(val)) { alert("ACCESSO FAMIGLIA NEGATO."); return; } } 
+            else { if(val !== ADMIN_PIN) { alert("PIN AMMINISTRATORE ERRATO."); return; } }
+            authChiaveUsata = val; document.getElementById('layerAuth').classList.add('hidden');
+            if(currentModulo === 'Search') openSearchUI(); else if(currentModulo === 'Calendar') openCalendarUI(); else openModal(currentModulo);
         }
 
         function openModal(n) { document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
         function closeModal() { document.getElementById('modalInput').classList.add('hidden'); }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
-
         function openSearchUI() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "RICERCA TESTO"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
         function openCalendarUI() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "SFOGLIA CALENDARIO"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
@@ -199,10 +195,7 @@
             if(!SR) return alert("Usa Chrome per la funzione vocale.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
             rec.onstart = () => { btn.classList.add('recording'); btn.innerText = "ASCOLTO..."; };
-            rec.onresult = (e) => { 
-                const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t;
-                if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa";
-            };
+            rec.onresult = (e) => { const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t; if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa"; };
             rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
             rec.start();
         }
