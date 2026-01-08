@@ -23,7 +23,7 @@
         <p class="text-[10px] text-gray-500 uppercase mb-8 tracking-[0.3em]">Autenticazione richiesta</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-3xl outline-none mb-10 tracking-[0.5em]">
         <button id="btnSys" onclick="accessSystem()" class="w-full bg-emerald-600 p-5 rounded-2xl font-black btn-active">SBLOCCA</button>
-        <p id="errorSys" class="text-red-500 text-xs mt-6 hidden font-bold">PIN NON VALIDO</p>
+        <p id="errorSys" class="text-red-500 text-xs mt-6 hidden font-bold uppercase">PIN NON VALIDO</p>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black z-[150] flex flex-col items-center justify-center p-8 text-center">
@@ -46,7 +46,7 @@
         <div class="grid grid-cols-2 gap-4 mb-8">
             <button onclick="requestAuth('Finanze')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">💰</span><span class="text-xs uppercase font-bold tracking-widest text-emerald-500/80">Finanze</span></button>
             <button onclick="requestAuth('Diario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">✍️</span><span class="text-xs uppercase font-bold tracking-widest text-emerald-500/80">Diario</span></button>
-            <button onclick="requestAuth('Inventario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">📦</span><span class="text-xs uppercase font-bold tracking-widest text-emerald-500/80">Inventario</span></button>
+            <button onclick="requestAuth('Inventario')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active"><span class="text-3xl mb-2">📦</span><span class="text-xs uppercase font-bold text-emerald-500/80">Inventario</span></button>
             <button onclick="requestAuth('Spesa')" class="glass p-6 rounded-2xl flex flex-col items-center btn-active border border-emerald-500/40"><span class="text-3xl mb-2">🛒</span><span class="text-xs uppercase text-emerald-500 font-black">Spesa Casa</span></button>
         </div>
 
@@ -91,29 +91,23 @@
 
     <script>
         const ANNI_VALIDI = ["1958", "1992"]; 
-        const API_URL = "https://script.google.com/macros/s/AKfycbzKpfbJpna_uQuj5ikhfUFk2y8RSkgjJw0_5MMM4IDmekEvr3sg1qrHnfxab542rcgC/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbydyig6tN19AUAgHxC8Y4vjBWsp7Ah1VSGjDyAs13n0RLoWEQwDC0Z811UTCTScP6Jx/exec"; 
 
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let authChiaveUsata = ""; 
         let currentModulo = "";
         let attachedFiles = [];
 
-        // Inizializzazione rapida se il PIN esiste già
         if(pinSistema) {
             document.getElementById('layerSystem').classList.add('hidden');
             document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
         }
 
-        // Funzione di Login con PING al server per validazione immediata
         function accessSystem() {
             const p = document.getElementById('pinSys').value;
-            const btn = document.getElementById('btnSys');
-            const error = document.getElementById('errorSys');
             if(!p) return;
-
-            btn.innerText = "VERIFICA...";
-            btn.disabled = true;
-
+            document.getElementById('btnSys').innerText = "VERIFICA...";
+            document.getElementById('btnSys').disabled = true;
             const script = document.createElement('script');
             script.src = `${API_URL}?azione=PING&pin=${p}&callback=handleLoginResponse`;
             document.body.appendChild(script);
@@ -121,16 +115,14 @@
 
         function handleLoginResponse(res) {
             const btn = document.getElementById('btnSys');
-            const error = document.getElementById('errorSys');
             if(res.status === "OK") {
                 pinSistema = document.getElementById('pinSys').value;
                 localStorage.setItem('sap_pin_sys', pinSistema);
                 document.getElementById('layerSystem').classList.add('hidden');
                 document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
             } else {
-                error.classList.remove('hidden');
-                btn.innerText = "SBLOCCA";
-                btn.disabled = false;
+                document.getElementById('errorSys').classList.remove('hidden');
+                btn.innerText = "SBLOCCA"; btn.disabled = false;
             }
         }
 
@@ -138,13 +130,8 @@
             currentModulo = mod;
             document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authInput').value = "";
-            if(mod === 'Spesa') {
-                document.getElementById('authTitle').innerText = "Accesso Familiare";
-                document.getElementById('authDesc').innerText = "Inserire anno di nascita autorizzato";
-            } else {
-                document.getElementById('authTitle').innerText = "Area Riservata";
-                document.getElementById('authDesc').innerText = "Inserire PIN amministratore";
-            }
+            document.getElementById('authTitle').innerText = (mod === 'Spesa') ? "Accesso Famiglia" : "Area Admin";
+            document.getElementById('authDesc').innerText = (mod === 'Spesa') ? "Inserire anno di nascita" : "Inserire PIN amministratore";
         }
 
         function confirmAuth() {
@@ -165,7 +152,7 @@
         function handleFiles(input) {
             Array.from(input.files).forEach(f => {
                 const reader = new FileReader();
-                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " allegati pronti."; document.getElementById('filePreview').classList.remove('hidden'); };
+                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); document.getElementById('filePreview').innerText = attachedFiles.length + " allegati."; document.getElementById('filePreview').classList.remove('hidden'); };
                 reader.readAsDataURL(f);
             });
         }
@@ -191,7 +178,7 @@
             if(!s || !e) return alert("Scegli le date.");
             const btn = document.getElementById('exportBtn'); btn.innerText = "ESPORTAZIONE...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ pinSistema: pinSistema, authChiave: authChiaveUsata || "", azione: "GENERA_REPORT", dataInizio: s.split('-').reverse().join('/'), dataFine: e.split('-').reverse().join('/') })});
-            btn.innerText = "✅ REPORT DISPONIBILE"; setTimeout(() => btn.innerText = "🚀 Esporta Report", 3000);
+            btn.innerText = "✅ REPORT PRONTO"; setTimeout(() => btn.innerText = "🚀 Esporta Report", 3000);
         }
 
         function runSearch() {
@@ -222,11 +209,9 @@
             rec.onstart = () => { btn.classList.add('recording'); btn.innerText = "🔴 ASCOLTO..."; };
             rec.onresult = (e) => { document.getElementById('mainInput').value = e.results[0][0].transcript; };
             rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
-            rec.onerror = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
             rec.start();
         }
         function resetApp() { localStorage.removeItem('sap_pin_sys'); location.reload(); }
     </script>
 </body>
 </html>
-
