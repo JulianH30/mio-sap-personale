@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
-        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
+        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; transition: opacity 2s; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
@@ -21,9 +21,9 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .brain-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); border: 1px solid #10b981 !important; }
-        .info-box { background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); padding: 12px; border-radius: 15px; margin-bottom: 15px; }
-        /* Badge Scadenze */
+        
+        /* Briefing Style */
+        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 5, 5, 0) 100%); border-left: 2px solid #10b981; transition: all 0.5s; }
         .badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 8px; }
         .badge-red { background: #ef4444; color: white; }
         .badge-yellow { background: #f59e0b; color: black; }
@@ -36,23 +36,28 @@
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase">SAP</h1>
-        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono">Vault 2026 Secured</p>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono italic">Authenticating...</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 transition-transform">SBLOCCA</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">ACCESSO NEGATO</p>
+        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95">CONNECT</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN INVALID</p>
     </div>
 
     <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col">
-        <header class="mb-10 mt-6 flex justify-between items-center">
+        <header class="mb-6 mt-6 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-tighter">Timeline Interface v26.3</p>
+                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-tighter">Awareness Core v26.4</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="requestAuth('Calendar')" class="glass p-3 rounded-2xl text-xl">📅</button>
                 <button onclick="requestAuth('Search')" class="glass p-3 rounded-full text-xl">🔍</button>
             </div>
         </header>
+
+        <div id="morningBriefing" class="briefing-card p-4 rounded-2xl mb-8 hidden opacity-0 transition-all duration-1000">
+            <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-1">Status Report</p>
+            <p id="briefingText" class="text-xs text-gray-300 italic">Analisi in corso...</p>
+        </div>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
             <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
@@ -72,8 +77,8 @@
         <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase italic">Dev-Designer Hysenji • v26.3</p>
-            <button onclick="resetApp()" class="bg-red-900/20 border border-red-500/30 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">System Lock</button>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • Intelligence Active</p>
+            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">System Lock</button>
         </footer>
     </div>
 
@@ -82,7 +87,7 @@
         <p id="authDesc" class="text-[10px] text-gray-500 mb-10 uppercase font-mono"></p>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
         <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white">CONFERMA</button>
-        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline font-bold">Annulla</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline">Indietro</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col">
@@ -98,28 +103,20 @@
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-10">
-            <h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-tighter">Mind Center</h2>
-            <button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button>
-        </div>
+        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
         <div id="searchBar" class="flex flex-col gap-4 mb-8">
             <div class="flex gap-2">
-                <input type="text" id="searchInput" placeholder="Cosa scade? / Somma ieri..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:brain-glow transition-all">
+                <input type="text" id="searchInput" placeholder="Somma oggi / Cosa scade..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:border-white transition-all">
                 <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-emerald-500 font-mono">
-                <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white shadow-lg">GO</button>
+                <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">GO</button>
             </div>
-            <div id="brainFeedback" class="text-[9px] text-emerald-500/60 font-mono uppercase italic px-2 tracking-tighter"></div>
+            <div id="brainFeedback" class="text-[9px] text-emerald-500/60 font-mono uppercase px-2 italic"></div>
         </div>
         <div id="searchLoading" class="hidden flex flex-col items-center justify-center py-10"><div class="loader"></div></div>
-        
-        <div id="smartDisplay" class="hidden info-box">
-            <p id="smartLabel" class="text-[9px] text-emerald-500 uppercase font-black mb-2 tracking-widest text-center">Processore Vault</p>
-            <div id="smartContent" class="flex flex-col items-center justify-center">
-                <p id="totalValue" class="text-3xl font-black text-white hidden">€ 0.00</p>
-                <p id="timelineInfo" class="text-xs font-bold text-emerald-400 hidden"></p>
-            </div>
+        <div id="smartDisplay" class="hidden p-4 border border-emerald-500/20 rounded-xl mb-4 text-center">
+            <p id="totalValue" class="text-3xl font-black text-white hidden">€ 0.00</p>
+            <p id="timelineInfo" class="text-xs font-bold text-emerald-400 hidden"></p>
         </div>
-
         <div id="searchResults" class="flex-1 overflow-y-auto space-y-4 pb-10"></div>
     </div>
 
@@ -132,11 +129,9 @@
 
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let authChiaveUsata = ""; let currentModulo = ""; let attachedFiles = [];
-        let searchMode = "text";
-        let mathMode = false;
-        let timelineMode = false;
+        let mathMode = false; let timelineMode = false;
 
-        if(pinSistema) { document.getElementById('layerSystem').classList.add('hidden'); document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100'); }
+        if(pinSistema) { startApp(); }
 
         const canvas = document.getElementById('matrix'); const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -144,94 +139,105 @@
         function drawMatrix() { ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#059669'; ctx.font = '15px monospace'; drops.forEach((y, i) => { const text = String.fromCharCode(Math.random()*128); ctx.fillText(text, i*20, y*20); if(y*20 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }); }
         setInterval(drawMatrix, 50);
 
-        // --- SAP MIND PARSER v26.3 (MATH + TIMELINE) ---
-        function sapMindParser(query) {
-            let q = query.toLowerCase().trim();
-            const feedback = document.getElementById('brainFeedback');
-            const smartBox = document.getElementById('smartDisplay');
-            const now = new Date();
-            
-            mathMode = q.includes("somma") || q.includes("totale") || q.includes("quanto");
-            timelineMode = q.includes("scade") || q.includes("scadenza") || q.includes("prossimi");
-
-            if(mathMode || timelineMode) smartBox.classList.remove('hidden');
-            else smartBox.classList.add('hidden');
-
-            const formatDate = (date) => {
-                let d = date.getDate().toString().padStart(2, '0');
-                let m = (date.getMonth() + 1).toString().padStart(2, '0');
-                let y = date.getFullYear();
-                return `${d}/${m}/${y}`;
-            };
-
-            let cleanQ = q.replace(/somma|totale|quanto|scade|scadenza|prossimi/g, "").trim();
-
-            if (cleanQ.includes("oggi")) { 
-                feedback.innerText = "Analisi dati odierni..."; 
-                return cleanQ.replace("oggi", formatDate(now)).trim(); 
-            }
-            if (cleanQ.includes("ieri")) { 
-                let d = new Date(); d.setDate(d.getDate() - 1);
-                feedback.innerText = "Analisi dati ieri...";
-                return cleanQ.replace("ieri", formatDate(d)).trim();
-            }
-            if (cleanQ.includes("domani")) { 
-                let d = new Date(); d.setDate(d.getDate() + 1);
-                feedback.innerText = "Analisi scadenze domani...";
-                return cleanQ.replace("domani", formatDate(d)).trim();
-            }
-            
-            feedback.innerText = "Elaborazione query complessa...";
-            return cleanQ;
-        }
-
         function accessSystem() {
             const p = document.getElementById('pinSys').value; if(!p) return;
             const script = document.createElement('script'); script.src = `${API_URL}?azione=PING&pin=${p}&callback=handleLoginResponse`; document.body.appendChild(script);
         }
 
         function handleLoginResponse(res) {
-            if(res.status === "OK") { pinSistema = document.getElementById('pinSys').value; localStorage.setItem('sap_pin_sys', pinSistema); document.getElementById('layerSystem').classList.add('hidden'); document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100'); }
+            if(res.status === "OK") { pinSistema = document.getElementById('pinSys').value; localStorage.setItem('sap_pin_sys', pinSistema); startApp(); }
             else { document.getElementById('errorSys').classList.remove('hidden'); }
+        }
+
+        function startApp() {
+            document.getElementById('layerSystem').classList.add('hidden');
+            document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
+            generateBriefing();
+        }
+
+        // 🧠 INNOVATION: AUTO-BRIEFING ENGINE
+        function generateBriefing() {
+            const d = new Date(); const today = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+            const script = document.createElement('script');
+            script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(today)}&pin=${pinSistema}&callback=processBriefing`;
+            document.body.appendChild(script);
+        }
+
+        function processBriefing(res) {
+            const briefing = document.getElementById('morningBriefing');
+            const text = document.getElementById('briefingText');
+            let total = 0; let tasks = 0;
+            
+            if(res && res.length > 0) {
+                res.forEach(r => {
+                    const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
+                    if(m) m.forEach(val => total += parseFloat(val.replace(',','.')));
+                    if(r.info.toLowerCase().includes("entro") || r.info.toLowerCase().includes("scade")) tasks++;
+                });
+                text.innerText = `Oggi: rilevati €${total.toFixed(2)} e ${tasks} scadenze attive.`;
+            } else {
+                text.innerText = "Nessuna attività rilevata per la data odierna.";
+            }
+            briefing.classList.remove('hidden');
+            setTimeout(() => briefing.style.opacity = "1", 500);
+        }
+
+        // 🧠 INNOVATION: MOOD ENGINE PARSER
+        function moodParser(text) {
+            const lowText = text.toLowerCase();
+            const bad = ["triste", "male", "stanco", "problema", "uff", "rabbia", "noia"];
+            const good = ["felice", "bene", "ottimo", "grande", "contento", "top", "wow"];
+            let tag = "";
+            
+            if(bad.some(w => lowText.includes(w))) {
+                tag = " #mood_critico";
+                document.getElementById('matrix').style.opacity = "0.05"; // Oscura interfaccia
+            } else if(good.some(w => lowText.includes(w))) {
+                tag = " #mood_positivo";
+                document.getElementById('matrix').style.opacity = "0.4"; // Illumina interfaccia
+            }
+            return tag;
         }
 
         function requestAuth(mod) {
             currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
             document.getElementById('authInput').value = "";
             document.getElementById('authTitle').innerText = mod.toUpperCase();
-            if(mod === 'Spesa') document.getElementById('authDesc').innerText = "Accesso Famiglia";
-            else if(mod === 'Search' || mod === 'Calendar') document.getElementById('authDesc').innerText = "Archivio Riservato";
-            else document.getElementById('authDesc').innerText = "Admin Area";
         }
 
         function confirmAuth() {
             const val = document.getElementById('authInput').value; if(!val) return;
-            if(currentModulo === 'Spesa') { if(!ANNI_VALIDI.includes(val)) { alert("NEGATO."); return; } } 
-            else { if(val !== ADMIN_PIN) { alert("PIN ERRATO."); return; } }
-            authChiaveUsata = val; document.getElementById('layerAuth').classList.add('hidden');
+            if(currentModulo === 'Spesa') { if(!ANNI_VALIDI.includes(val)) return alert("NEGATO."); } 
+            else { if(val !== ADMIN_PIN) return alert("PIN ERRATO."); }
+            document.getElementById('layerAuth').classList.add('hidden');
+            authChiaveUsata = val;
             if(currentModulo === 'Search') openSearchUI(); else if(currentModulo === 'Calendar') openCalendarUI(); else openModal(currentModulo);
         }
 
         function openModal(n) { document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
         function closeModal() { document.getElementById('modalInput').classList.add('hidden'); }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
-        function openSearchUI() { searchMode = "text"; document.getElementById('searchModalTitle').innerText = "SAP MIND ENGINE"; document.getElementById('searchInput').classList.remove('hidden'); document.getElementById('searchDateInput').classList.add('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
-        function openCalendarUI() { searchMode = "date"; document.getElementById('searchModalTitle').innerText = "SFOGLIA CALENDARIO"; document.getElementById('searchInput').classList.add('hidden'); document.getElementById('searchDateInput').classList.remove('hidden'); document.getElementById('searchModal').classList.remove('hidden'); }
-        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); document.getElementById('smartDisplay').classList.add('hidden'); }
+        function openSearchUI() { document.getElementById('searchModal').classList.remove('hidden'); }
+        function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
 
         async function sendData() {
             const btn = document.getElementById('sendBtn'); btn.innerText = "INVIO...";
-            const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: document.getElementById('mainInput').value, keywords: document.getElementById('tagInput').value, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
+            const text = document.getElementById('mainInput').value;
+            const extraTag = moodParser(text);
+            const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: text, keywords: document.getElementById('tagInput').value + extraTag, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                 btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000);
-            } catch (e) { alert("Dato inviato."); closeModal(); }
+            } catch (e) { alert("Inviato."); closeModal(); }
         }
 
         function runSearch() {
-            let rawQ = (searchMode === "text") ? document.getElementById('searchInput').value : document.getElementById('searchDateInput').value.split('-').reverse().join('/');
-            if(!rawQ) return;
-            let q = (searchMode === "text") ? sapMindParser(rawQ) : rawQ;
+            let q = document.getElementById('searchInput').value;
+            if(!q) return;
+            // Supporto logica v26.3
+            mathMode = q.includes("somma") || q.includes("totale");
+            timelineMode = q.includes("scade") || q.includes("entro");
+            
             document.getElementById('searchResults').innerHTML = ""; document.getElementById('searchLoading').classList.remove('hidden');
             const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(q)}&pin=${pinSistema}&callback=handleSearchResponse`; document.body.appendChild(script);
         }
@@ -239,63 +245,28 @@
         function handleSearchResponse(res) {
             document.getElementById('searchLoading').classList.add('hidden');
             const div = document.getElementById('searchResults');
+            const smart = document.getElementById('smartDisplay');
             const totalDisp = document.getElementById('totalValue');
-            const timelineDisp = document.getElementById('timelineInfo');
-            let grandTotal = 0; let deadlineCount = 0;
-            const now = new Date(); now.setHours(0,0,0,0);
+            let grandTotal = 0;
 
-            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center py-10 opacity-50 uppercase text-[10px] font-mono'>No results in Vault</p>"; return; }
+            if(!res || res.length === 0) { div.innerHTML = "<p class='text-center py-10 opacity-30 text-[10px]'>Nessun match.</p>"; return; }
             
             div.innerHTML = res.map(r => {
-                let badgeHtml = "";
-                
-                // 🧠 LOGICA MATH
                 if(mathMode) {
-                    const matches = r.info.match(/(\d+[\.,]\d+|\d+)/g);
-                    if(matches) matches.forEach(m => grandTotal += parseFloat(m.replace(',', '.')));
-                    totalDisp.classList.remove('hidden');
-                } else { totalDisp.classList.add('hidden'); }
-
-                // 🧠 LOGICA TIMELINE (Rileva date nel testo)
-                const dateMatch = r.info.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
-                if(dateMatch) {
-                    const parts = dateMatch[0].split(/[\/\-.]/);
-                    const day = parseInt(parts[0]), month = parseInt(parts[1]) - 1, year = parts[2].length === 2 ? 2000 + parseInt(parts[2]) : parseInt(parts[2]);
-                    const itemDate = new Date(year, month, day);
-                    const diff = (itemDate - now) / (1000 * 60 * 60 * 24);
-
-                    if(diff < 0) badgeHtml = `<span class="badge badge-red">Scaduto</span>`;
-                    else if(diff <= 3) badgeHtml = `<span class="badge badge-yellow">In Scadenza</span>`;
-                    else badgeHtml = `<span class="badge badge-green">Programmato</span>`;
-                    
-                    if(timelineMode) deadlineCount++;
+                    const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
+                    if(m) m.forEach(val => grandTotal += parseFloat(val.replace(',','.')));
                 }
-
-                return `<div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 mb-3">
-                    <div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1 uppercase">
-                        <span>${r.modulo} ${badgeHtml}</span><span>${r.data}</span>
-                    </div>
-                    <div class="text-sm font-bold text-white mb-2">${r.info}</div>
-                    ${r.link ? `<a href="${r.link}" target="_blank" class="text-[9px] bg-emerald-500/10 p-2 rounded block text-center border border-emerald-500/20 font-black text-emerald-400">VEDI ALLEGATO</a>` : ""}
-                </div>`;
+                return `<div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white">${r.info}</div></div>`;
             }).join('');
-
-            if(mathMode) totalDisp.innerText = `€ ${grandTotal.toFixed(2)}`;
-            if(timelineMode) {
-                timelineDisp.innerText = `Rilevate ${deadlineCount} scadenze attive`;
-                timelineDisp.classList.remove('hidden');
-            } else { timelineDisp.classList.add('hidden'); }
+            
+            if(mathMode) { smart.classList.remove('hidden'); totalDisp.classList.remove('hidden'); totalDisp.innerText = `€ ${grandTotal.toFixed(2)}`; }
         }
 
         function startVoice() {
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SR) return alert("Usa Chrome.");
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return alert("Usa Chrome.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
             rec.onstart = () => { btn.classList.add('recording'); btn.innerText = "ASCOLTO..."; };
-            rec.onresult = (e) => { 
-                const t = e.results[0][0].transcript; document.getElementById('mainInput').value = t; 
-                if(t.toLowerCase().includes("spesa")) document.getElementById('tagInput').value = "#auto_spesa";
-            };
+            rec.onresult = (e) => { document.getElementById('mainInput').value = e.results[0][0].transcript; };
             rec.onend = () => { btn.classList.remove('recording'); btn.innerText = "🎙️ VOCE"; };
             rec.start();
         }
