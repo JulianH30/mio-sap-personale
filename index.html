@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         body { background-color: #050505; color: #e5e5e5; font-family: 'Inter', sans-serif; overflow: hidden; }
-        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; transition: opacity 2s; }
+        #matrix { position: fixed; inset: 0; z-index: -1; opacity: 0.15; transition: all 1.5s ease; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
@@ -22,31 +22,31 @@
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Briefing Style */
-        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 5, 5, 0) 100%); border-left: 2px solid #10b981; transition: all 0.5s; }
+        /* v26.4 UI Components */
+        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 5, 0) 100%); border-left: 3px solid #10b981; transition: all 0.8s ease; }
+        .alert-predictive { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.05); }
         .badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 8px; }
         .badge-red { background: #ef4444; color: white; }
         .badge-yellow { background: #f59e0b; color: black; }
-        .badge-green { background: #10b981; color: white; }
     </style>
 </head>
-<body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col">
+<body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col relative">
     
     <canvas id="matrix"></canvas>
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
-        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase">SAP</h1>
-        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono italic">Authenticating...</p>
+        <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono">Awareness Core Active</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95">CONNECT</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN INVALID</p>
+        <button onclick="accessSystem()" id="btnSys" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 transition-all">SBLOCCA</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN NON VALIDO</p>
     </div>
 
-    <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col">
+    <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col z-10">
         <header class="mb-6 mt-6 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-tighter">Awareness Core v26.4</p>
+                <p class="text-[9px] text-gray-500 uppercase font-mono">Prediction Enabled v26.4</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="requestAuth('Calendar')" class="glass p-3 rounded-2xl text-xl">📅</button>
@@ -54,31 +54,34 @@
             </div>
         </header>
 
-        <div id="morningBriefing" class="briefing-card p-4 rounded-2xl mb-8 hidden opacity-0 transition-all duration-1000">
-            <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-1">Status Report</p>
-            <p id="briefingText" class="text-xs text-gray-300 italic">Analisi in corso...</p>
+        <div id="morningBriefing" class="briefing-card p-5 rounded-2xl mb-8 hidden opacity-0">
+            <div class="flex justify-between items-start mb-2">
+                <p id="briefingLabel" class="text-[10px] text-emerald-500 font-black uppercase tracking-widest">System Briefing</p>
+                <span id="predictionBadge" class="hidden badge badge-yellow">Prediction</span>
+            </div>
+            <p id="briefingText" class="text-xs text-gray-300 leading-relaxed italic">Analisi pattern in corso...</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
             <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
-                <span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400">Finanze</span>
+                <span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Finanze</span>
             </button>
             <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
-                <span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400">Diario</span>
+                <span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Diario</span>
             </button>
             <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95 transition-all">
-                <span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400">Inventario</span>
+                <span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Inventario</span>
             </button>
             <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95 transition-all">
-                <span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black">Spesa</span>
+                <span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black font-mono">Spesa</span>
             </button>
         </div>
 
-        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20">Genera Report</button>
+        <button onclick="triggerExport()" id="exportBtn" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20 active:scale-95">Cloud Backup & Report</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • Intelligence Active</p>
-            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">System Lock</button>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase italic">Dev-Designer Hysenji • awareness v26.4</p>
+            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Lock</button>
         </footer>
     </div>
 
@@ -90,23 +93,23 @@
         <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline">Indietro</button>
     </div>
 
-    <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col">
+    <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/95 backdrop-blur-2xl">
         <div class="flex justify-between items-center mb-8"><h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase"></h2><button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button></div>
-        <textarea id="mainInput" placeholder="Recording..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px] resize-none"></textarea>
-        <input type="text" id="tagInput" placeholder="#keywords" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono">
+        <textarea id="mainInput" placeholder="Write or record..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px] resize-none"></textarea>
+        <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono italic">
         <div class="flex gap-4 mb-10">
             <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
             <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 File</button>
         </div>
-        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white uppercase tracking-widest">Transmit</button>
+        <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-[2.5rem] font-black text-white uppercase shadow-2xl">Transmit</button>
     </div>
 
-    <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col">
+    <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/98">
         <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase">Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
         <div id="searchBar" class="flex flex-col gap-4 mb-8">
             <div class="flex gap-2">
-                <input type="text" id="searchInput" placeholder="Somma oggi / Cosa scade..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:border-white transition-all">
+                <input type="text" id="searchInput" placeholder="Somma / Scadenze / Ricerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white">
                 <input type="date" id="searchDateInput" class="hidden bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-emerald-500 font-mono">
                 <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white">GO</button>
             </div>
@@ -152,68 +155,80 @@
         function startApp() {
             document.getElementById('layerSystem').classList.add('hidden');
             document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100');
-            generateBriefing();
+            awarenessEngine(); 
         }
 
-        // 🧠 INNOVATION: AUTO-BRIEFING ENGINE
-        function generateBriefing() {
-            const d = new Date(); const today = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+        // --- 🚀 v26.4 AWARENESS & PREDICTION ENGINE ---
+        function awarenessEngine() {
+            const d = new Date(); 
+            const today = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+            
+            // Calcolo data del mese scorso per la previsione
+            let lastMonthDate = new Date(); lastMonthDate.setDate(lastMonthDate.getDate() - 30);
+            const prevMonthStr = `${lastMonthDate.getDate().toString().padStart(2,'0')}/${(lastMonthDate.getMonth()+1).toString().padStart(2,'0')}/${lastMonthDate.getFullYear()}`;
+
+            // Eseguiamo la ricerca per oggi
             const script = document.createElement('script');
-            script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(today)}&pin=${pinSistema}&callback=processBriefing`;
+            script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(today)}&pin=${pinSistema}&callback=processTodayBriefing`;
             document.body.appendChild(script);
+
+            // Eseguiamo silenziosamente la ricerca per la previsione (mese scorso)
+            setTimeout(() => {
+                const scriptPrev = document.createElement('script');
+                scriptPrev.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(prevMonthStr)}&pin=${pinSistema}&callback=processPredictions`;
+                document.body.appendChild(scriptPrev);
+            }, 1000);
         }
 
-        function processBriefing(res) {
+        function processTodayBriefing(res) {
             const briefing = document.getElementById('morningBriefing');
             const text = document.getElementById('briefingText');
             let total = 0; let tasks = 0;
-            
             if(res && res.length > 0) {
                 res.forEach(r => {
                     const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
                     if(m) m.forEach(val => total += parseFloat(val.replace(',','.')));
                     if(r.info.toLowerCase().includes("entro") || r.info.toLowerCase().includes("scade")) tasks++;
                 });
-                text.innerText = `Oggi: rilevati €${total.toFixed(2)} e ${tasks} scadenze attive.`;
+                text.innerHTML = `Oggi: rilevati €${total.toFixed(2)} e ${tasks} scadenze attive.`;
             } else {
-                text.innerText = "Nessuna attività rilevata per la data odierna.";
+                text.innerText = "Nessuna attività registrata per oggi.";
             }
             briefing.classList.remove('hidden');
             setTimeout(() => briefing.style.opacity = "1", 500);
         }
 
-        // 🧠 INNOVATION: MOOD ENGINE PARSER
-        function moodParser(text) {
-            const lowText = text.toLowerCase();
-            const bad = ["triste", "male", "stanco", "problema", "uff", "rabbia", "noia"];
-            const good = ["felice", "bene", "ottimo", "grande", "contento", "top", "wow"];
-            let tag = "";
+        function processPredictions(res) {
+            const briefing = document.getElementById('morningBriefing');
+            const text = document.getElementById('briefingText');
+            const badge = document.getElementById('predictionBadge');
+            const recurringWords = ["bolletta", "affitto", "abbonamento", "ricarica", "rata", "luce", "gas"];
             
-            if(bad.some(w => lowText.includes(w))) {
-                tag = " #mood_critico";
-                document.getElementById('matrix').style.opacity = "0.05"; // Oscura interfaccia
-            } else if(good.some(w => lowText.includes(w))) {
-                tag = " #mood_positivo";
-                document.getElementById('matrix').style.opacity = "0.4"; // Illumina interfaccia
+            if(res && res.length > 0) {
+                let foundRecurring = res.filter(r => recurringWords.some(word => r.info.toLowerCase().includes(word)));
+                if(foundRecurring.length > 0) {
+                    briefing.classList.add('alert-predictive');
+                    badge.classList.remove('hidden');
+                    text.innerHTML += `<br><span class="text-yellow-500 font-bold">PREVISIONE:</span> Rilevati pattern ricorrenti dal mese scorso (${foundRecurring[0].info}). Possibile uscita in arrivo.`;
+                }
             }
-            return tag;
         }
 
-        function requestAuth(mod) {
-            currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden');
-            document.getElementById('authInput').value = "";
-            document.getElementById('authTitle').innerText = mod.toUpperCase();
+        // --- MOOD ENGINE (REACTION v26.4) ---
+        function moodFeedback(text) {
+            const low = text.toLowerCase();
+            const matrix = document.getElementById('matrix');
+            if(["triste", "male", "stanco", "problema", "rabbia"].some(w => low.includes(w))) {
+                matrix.style.opacity = "0.03"; return " #mood_critico";
+            } else if(["felice", "bene", "ottimo", "grande", "wow"].some(w => low.includes(w))) {
+                matrix.style.opacity = "0.5"; return " #mood_positivo";
+            }
+            return "";
         }
 
-        function confirmAuth() {
-            const val = document.getElementById('authInput').value; if(!val) return;
-            if(currentModulo === 'Spesa') { if(!ANNI_VALIDI.includes(val)) return alert("NEGATO."); } 
-            else { if(val !== ADMIN_PIN) return alert("PIN ERRATO."); }
-            document.getElementById('layerAuth').classList.add('hidden');
-            authChiaveUsata = val;
-            if(currentModulo === 'Search') openSearchUI(); else if(currentModulo === 'Calendar') openCalendarUI(); else openModal(currentModulo);
-        }
-
+        // --- AUTH & SEARCH (Invariati per sicurezza) ---
+        function requestAuth(mod) { currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden'); document.getElementById('authInput').value = ""; document.getElementById('authTitle').innerText = mod.toUpperCase(); }
+        function confirmAuth() { const val = document.getElementById('authInput').value; if(!val) return; if(currentModulo === 'Spesa') { if(!ANNI_VALIDI.includes(val)) return alert("NEGATO."); } else { if(val !== ADMIN_PIN) return alert("PIN ERRATO."); } document.getElementById('layerAuth').classList.add('hidden'); authChiaveUsata = val; if(currentModulo === 'Search') openSearchUI(); else if(currentModulo === 'Calendar') openCalendarUI(); else openModal(currentModulo); }
         function openModal(n) { document.getElementById('modalTitle').innerText = n.toUpperCase(); document.getElementById('modalInput').classList.remove('hidden'); }
         function closeModal() { document.getElementById('modalInput').classList.add('hidden'); }
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
@@ -223,21 +238,15 @@
         async function sendData() {
             const btn = document.getElementById('sendBtn'); btn.innerText = "INVIO...";
             const text = document.getElementById('mainInput').value;
-            const extraTag = moodParser(text);
-            const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: text, keywords: document.getElementById('tagInput').value + extraTag, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
-            try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000);
-            } catch (e) { alert("Inviato."); closeModal(); }
+            const mTag = moodFeedback(text);
+            const payload = { pinSistema: pinSistema, authChiave: authChiaveUsata, modulo: currentModulo, oggetto: text, keywords: document.getElementById('tagInput').value + mTag, files: attachedFiles, folderKey: currentModulo.toUpperCase() };
+            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "TRASMETTI"; }, 1000); } 
+            catch (e) { alert("Inviato."); closeModal(); }
         }
 
         function runSearch() {
-            let q = document.getElementById('searchInput').value;
-            if(!q) return;
-            // Supporto logica v26.3
-            mathMode = q.includes("somma") || q.includes("totale");
-            timelineMode = q.includes("scade") || q.includes("entro");
-            
+            let q = document.getElementById('searchInput').value; if(!q) return;
+            mathMode = q.includes("somma") || q.includes("totale"); timelineMode = q.includes("scade") || q.includes("entro");
             document.getElementById('searchResults').innerHTML = ""; document.getElementById('searchLoading').classList.remove('hidden');
             const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(q)}&pin=${pinSistema}&callback=handleSearchResponse`; document.body.appendChild(script);
         }
@@ -248,17 +257,11 @@
             const smart = document.getElementById('smartDisplay');
             const totalDisp = document.getElementById('totalValue');
             let grandTotal = 0;
-
             if(!res || res.length === 0) { div.innerHTML = "<p class='text-center py-10 opacity-30 text-[10px]'>Nessun match.</p>"; return; }
-            
             div.innerHTML = res.map(r => {
-                if(mathMode) {
-                    const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
-                    if(m) m.forEach(val => grandTotal += parseFloat(val.replace(',','.')));
-                }
+                if(mathMode) { const m = r.info.match(/(\d+[\.,]\d+|\d+)/g); if(m) m.forEach(val => grandTotal += parseFloat(val.replace(',','.'))); }
                 return `<div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white">${r.info}</div></div>`;
             }).join('');
-            
             if(mathMode) { smart.classList.remove('hidden'); totalDisp.classList.remove('hidden'); totalDisp.innerText = `€ ${grandTotal.toFixed(2)}`; }
         }
 
