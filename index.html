@@ -19,10 +19,16 @@
         #layerAuth { z-index: 900; }
         #layerGhostPaper { z-index: 1100; background: #000; display: none; position: fixed; inset: 0; flex-direction: column; }
         #modalInput, #searchModal { z-index: 800; background: rgba(0,0,0,0.98); }
+        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 5, 0) 100%); border-left: 3px solid #10b981; }
+        
+        /* v29.5 Smart Chips */
+        .smart-chip { font-size: 9px; padding: 6px 12px; border-radius: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px; }
+        .chip-alert { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .chip-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .smart-chip:active { scale: 0.95; opacity: 0.8; }
+        
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 5, 0) 100%); border-left: 3px solid #10b981; }
-        .category-chip { font-size: 8px; padding: 2px 5px; border-radius: 4px; background: rgba(16,185,129,0.1); color: #10b981; font-weight: bold; border: 0.5px solid rgba(16,185,129,0.2); }
     </style>
 </head>
 <body class="p-4 max-w-lg mx-auto min-h-screen flex flex-col relative">
@@ -31,21 +37,21 @@
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
-        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono italic">Security Protocol v29.1</p>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono">Proactive OS v29.5</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 transition-all">SBLOCCA</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN ERRATO</p>
+        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95">ACCEDI</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN SISTEMA ERRATO</p>
     </div>
 
     <div id="layerGhostPaper">
         <header class="p-4 glass flex flex-col gap-3">
             <div class="flex justify-between items-center">
                 <h2 class="text-emerald-500 font-black uppercase text-xs tracking-widest">Ghost Paper View</h2>
-                <button onclick="closeGhostPaper()" class="bg-red-900/40 text-red-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">Chiudi</button>
+                <button onclick="closeGhostPaper()" class="bg-red-900/40 text-red-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">Esci</button>
             </div>
             <div class="flex gap-2">
-                <input type="text" id="ghostSearchInput" placeholder="Cerca nella carta..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-emerald-400 outline-none">
-                <button onclick="searchInGhostPaper()" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black text-white uppercase">Trova</button>
+                <input type="text" id="ghostSearchInput" placeholder="Cerca nella pergamena..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-emerald-400 outline-none">
+                <button onclick="searchInGhostPaper()" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black text-white uppercase font-mono">Vai</button>
             </div>
         </header>
         <iframe id="ghostFrame" class="w-full flex-grow bg-white" style="border:none;"></iframe>
@@ -55,7 +61,7 @@
         <header class="mb-6 mt-6 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-widest italic">Neon Intelligence</p>
+                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-widest">AI Financial Coach</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="requestAuth('Infinity')" class="glass p-3 rounded-2xl text-xl">📄</button>
@@ -64,55 +70,53 @@
             </div>
         </header>
 
-        <div id="morningBriefing" class="briefing-card p-5 rounded-2xl mb-8 hidden opacity-0">
-            <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-1">Status Report</p>
-            <p id="briefingText" class="text-xs text-gray-300 italic mb-4">Sincronizzazione dati...</p>
+        <div id="morningBriefing" class="briefing-card p-5 rounded-2xl mb-8 hidden opacity-0 transition-all duration-1000">
+            <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-1 italic">Intelligence Briefing</p>
+            <p id="briefingText" class="text-xs text-gray-300 italic mb-4">Analisi transazioni...</p>
             
-            <div class="flex items-center gap-4">
-                <div class="w-32 h-32 relative">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-                <div id="categoryBreakdown" class="flex-1 flex flex-col gap-1"></div>
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-24 h-24 relative"><canvas id="expenseChart"></canvas></div>
+                <div id="smartTray" class="flex-1 flex flex-wrap gap-2 content-start"></div>
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
-            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Finanze</span></button>
-            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Diario</span></button>
-            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Inventario</span></button>
-            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95"><span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black font-mono">Spesa</span></button>
+            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Finanze</span></button>
+            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Diario</span></button>
+            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Inventario</span></button>
+            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95"><span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black font-mono tracking-widest">Spesa</span></button>
         </div>
 
-        <button onclick="triggerExport()" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20 active:scale-95">Cloud Report v29.1</button>
+        <button onclick="triggerExport()" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20 active:scale-95 tracking-widest">Report Generativo v29.5</button>
 
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • Core Secure</p>
-            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">Logout</button>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • pappa-protocol active</p>
+            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Lock</button>
         </footer>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h2 id="authTitle" class="text-2xl font-black text-emerald-500 mb-2 uppercase tracking-tighter"></h2>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white shadow-xl shadow-emerald-500/10">CONFERMA</button>
-        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline font-bold">Annulla</button>
+        <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 shadow-xl shadow-emerald-500/10 uppercase">Verifica</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline font-bold">Indietro</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/95 backdrop-blur-2xl">
-        <div class="flex justify-between items-center mb-8"><h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase"></h2><button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button></div>
-        <textarea id="mainInput" oninput="autoCategorize(this.value)" placeholder="Registra..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px] resize-none"></textarea>
+        <div class="flex justify-between items-center mb-8"><h2 id="modalTitle" class="text-xl font-black text-emerald-500 uppercase font-mono tracking-tighter"></h2><button onclick="closeModal()" class="text-gray-500 text-xs font-bold uppercase">X</button></div>
+        <textarea id="mainInput" oninput="autoCategorize(this.value)" placeholder="Registra transazione..." class="bg-transparent border-b border-white/10 w-full py-4 text-2xl outline-none mb-6 text-white min-h-[120px] resize-none"></textarea>
         <div id="categorySuggestion" class="mb-4 text-[10px] text-emerald-500 font-black uppercase italic hidden"></div>
         <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono italic">
         <div class="flex gap-4 mb-10">
             <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
-            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 File</button>
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white font-mono">📎 File</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
         </div>
         <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-[2.5rem] font-black text-white uppercase tracking-widest shadow-2xl">Transmit</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/98">
-        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
+        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Vault Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
         <div class="flex gap-2 mb-8">
             <input type="text" id="searchInput" placeholder="Somma / Cerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:border-white transition-all">
             <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white shadow-lg">GO</button>
@@ -125,7 +129,7 @@
 
         const API_URL = "https://script.google.com/macros/s/AKfycbx7EO2rVCWaiV5AJ3HQxg9z7m70MiyugAfS6oVvo1L8nyXzJo16WlQ51SIyTuhF8Auj/exec"; 
         const ANNI_VALIDI = ["1958", "1992"]; 
-        const ADMIN_PIN = "pappa01"; // NUOVO PIN AGGIORNATO
+        const ADMIN_PIN = "pappa01";
 
         const CATEGORIE = {
             "🛒 SPESA": ["lidl", "conad", "esselunga", "carrefour", "coop", "spesa", "cibo", "supermercato"],
@@ -137,8 +141,7 @@
 
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let authChiaveUsata = ""; let currentModulo = ""; let attachedFiles = [];
-        let mathMode = false;
-        let mainChart = null;
+        let mathMode = false; let mainChart = null;
 
         if(pinSistema) { startApp(); }
 
@@ -168,8 +171,11 @@
         function processTodayBriefing(res) {
             const briefing = document.getElementById('morningBriefing');
             const text = document.getElementById('briefingText');
-            const breakdownDiv = document.getElementById('categoryBreakdown');
-            let total = 0; let cats = {};
+            const tray = document.getElementById('smartTray');
+            let total = 0; let cats = {}; let urgentTasks = 0;
+
+            tray.innerHTML = ""; // Pulisce lo Smart Tray
+
             if(res && res.length > 0) {
                 res.forEach(r => {
                     const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
@@ -179,12 +185,31 @@
                         for(let c in CATEGORIE) { if(CATEGORIE[c].some(k => r.info.toLowerCase().includes(k))) foundCat = c; }
                         cats[foundCat] = (cats[foundCat] || 0) + val;
                     }
+                    if(r.info.toLowerCase().includes("scade") || r.info.toLowerCase().includes("entro")) urgentTasks++;
                 });
-                text.innerHTML = `Oggi: totale <b>€${total.toFixed(2)}</b>.`;
-                breakdownDiv.innerHTML = Object.entries(cats).map(([c, v]) => `<span class="category-chip">${c}</span>`).join('');
+
+                text.innerHTML = `Oggi: spesa totale <b>€${total.toFixed(2)}</b>.`;
+                
+                // 🚀 v29.5 CHIPS LOGIC
+                if(urgentTasks > 0) {
+                    tray.innerHTML += `<div class="smart-chip chip-alert" onclick="quickSearch('scade')">🚨 ${urgentTasks} SCADENZE</div>`;
+                }
+                
+                for(let c in cats) {
+                    if(cats[c] > 30) {
+                        tray.innerHTML += `<div class="smart-chip chip-warn" onclick="quickSearch('${c.split(' ')[1]}')">⚠️ SOGLIA ${c}</div>`;
+                    }
+                }
+
                 renderNeonChart(cats);
-            } else { text.innerText = "Nessuna spesa oggi."; }
+            } else { text.innerText = "Vault sincronizzato. Nessuna anomalia oggi."; }
             briefing.classList.remove('hidden'); setTimeout(() => briefing.style.opacity = "1", 500);
+        }
+
+        function quickSearch(query) {
+            openSearchUI();
+            document.getElementById('searchInput').value = query;
+            runSearch();
         }
 
         function renderNeonChart(data) {
@@ -196,18 +221,12 @@
                     labels: Object.keys(data),
                     datasets: [{
                         data: Object.values(data),
-                        backgroundColor: ['#10b981', '#059669', '#34d399', '#064e3b', '#6ee7b7'],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#34d399', '#064e3b'],
                         borderColor: '#050505',
-                        borderWidth: 2,
-                        hoverOffset: 4
+                        borderWidth: 1
                     }]
                 },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                    plugins: { legend: { display: false } },
-                    animation: { animateScale: true }
-                }
+                options: { responsive: true, cutout: '75%', plugins: { legend: { display: false } } }
             });
         }
 
@@ -237,13 +256,12 @@
             if (!query) return;
             const innerDoc = frame.contentDocument || frame.contentWindow.document;
             const divs = innerDoc.querySelectorAll('div');
-            let found = false;
             for (let div of divs) {
                 if (div.textContent.toLowerCase().includes(query)) {
                     div.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     div.style.outline = '4px solid #10b981';
                     setTimeout(() => div.style.outline = 'none', 3000);
-                    found = true; break;
+                    break;
                 }
             }
         }
@@ -271,7 +289,7 @@
             const cat = autoCategorize(text);
             const payload = { pinSistema: pinSistema, authChiave: ADMIN_PIN, modulo: currentModulo, oggetto: text, keywords: document.getElementById('tagInput').value + (cat ? " " + cat : ""), files: attachedFiles, folderKey: currentModulo.toUpperCase() };
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "Transmit"; }, 1000); } 
-            catch (e) { alert("Inviato."); closeModal(); }
+            catch (e) { alert("Dato Inviato."); closeModal(); }
         }
 
         function runSearch() {
