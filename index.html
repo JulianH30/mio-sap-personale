@@ -17,16 +17,13 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
-        #layerGhostPaper { z-index: 1100; background: #000; display: none; position: fixed; inset: 0; flex-direction: column; }
+        #layerGhostPaper, #layerDocs { z-index: 1100; background: #000; display: none; position: fixed; inset: 0; flex-direction: column; }
+        #layerDocs { z-index: 1200; }
         #modalInput, #searchModal { z-index: 800; background: rgba(0,0,0,0.98); }
-        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 5, 0) 100%); border-left: 3px solid #10b981; }
-        
-        /* v29.5 Smart Chips */
         .smart-chip { font-size: 9px; padding: 6px 12px; border-radius: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px; }
         .chip-alert { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .chip-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .smart-chip:active { scale: 0.95; opacity: 0.8; }
-        
+        .briefing-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 5, 5, 0) 100%); border-left: 3px solid #10b981; }
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -37,10 +34,10 @@
 
     <div id="layerSystem" class="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h1 class="text-4xl font-black text-emerald-500 mb-2 uppercase tracking-tighter">SAP</h1>
-        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono">Proactive OS v29.5</p>
+        <p class="text-[10px] text-gray-600 uppercase mb-12 tracking-widest font-mono italic">Chronicle Protocol v29.6</p>
         <input type="password" id="pinSys" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95">ACCEDI</button>
-        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN SISTEMA ERRATO</p>
+        <button onclick="accessSystem()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95">SBLOCCA</button>
+        <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN ERRATO</p>
     </div>
 
     <div id="layerGhostPaper">
@@ -50,30 +47,39 @@
                 <button onclick="closeGhostPaper()" class="bg-red-900/40 text-red-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">Esci</button>
             </div>
             <div class="flex gap-2">
-                <input type="text" id="ghostSearchInput" placeholder="Cerca nella pergamena..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-emerald-400 outline-none">
-                <button onclick="searchInGhostPaper()" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black text-white uppercase font-mono">Vai</button>
+                <input type="text" id="ghostSearchInput" placeholder="Cerca nella carta..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-emerald-400 outline-none">
+                <button onclick="searchInGhostPaper()" class="bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black text-white uppercase">Vai</button>
             </div>
         </header>
         <iframe id="ghostFrame" class="w-full flex-grow bg-white" style="border:none;"></iframe>
     </div>
 
+    <div id="layerDocs">
+        <header class="p-4 glass flex justify-between items-center">
+            <h2 class="text-emerald-500 font-black uppercase text-xs tracking-widest">Master Readme / Protocols</h2>
+            <button onclick="closeDocs()" class="bg-white/5 text-gray-400 px-4 py-1 rounded-lg text-[10px] font-black uppercase">Chiudi</button>
+        </header>
+        <div id="docsContent" class="p-6 overflow-y-auto text-sm leading-relaxed font-mono text-gray-400"></div>
+    </div>
+
     <div id="appContent" class="opacity-0 transition-opacity duration-700 flex-grow flex flex-col z-10">
         <header class="mb-6 mt-6 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-black text-white tracking-tighter uppercase">Personal <span class="text-emerald-500">SAP</span></h1>
-                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-widest">AI Financial Coach</p>
+                <h1 onmousedown="startTimerDoc()" onmouseup="stopTimerDoc()" ontouchstart="startTimerDoc()" ontouchend="stopTimerDoc()" class="text-2xl font-black text-white tracking-tighter uppercase cursor-pointer">
+                    Personal <span class="text-emerald-500">SAP</span>
+                </h1>
+                <p class="text-[9px] text-gray-500 uppercase font-mono tracking-widest italic">Encrypted OS</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="requestAuth('Infinity')" class="glass p-3 rounded-2xl text-xl">📄</button>
                 <button onclick="requestAuth('Calendar')" class="glass p-3 rounded-2xl text-xl">📅</button>
-                <button onclick="requestAuth('Search')" class="glass p-3 rounded-2xl text-xl">🔍</button>
+                <button onclick="requestAuth('Search')" class="glass p-3 rounded-full text-xl">🔍</button>
             </div>
         </header>
 
-        <div id="morningBriefing" class="briefing-card p-5 rounded-2xl mb-8 hidden opacity-0 transition-all duration-1000">
+        <div id="morningBriefing" class="briefing-card p-5 rounded-2xl mb-8 hidden opacity-0 transition-all">
             <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-1 italic">Intelligence Briefing</p>
-            <p id="briefingText" class="text-xs text-gray-300 italic mb-4">Analisi transazioni...</p>
-            
+            <p id="briefingText" class="text-xs text-gray-300 italic mb-4"></p>
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-24 h-24 relative"><canvas id="expenseChart"></canvas></div>
                 <div id="smartTray" class="flex-1 flex flex-wrap gap-2 content-start"></div>
@@ -81,25 +87,23 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-10">
-            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Finanze</span></button>
-            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Diario</span></button>
-            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono tracking-widest">Inventario</span></button>
-            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95"><span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black font-mono tracking-widest">Spesa</span></button>
+            <button onclick="requestAuth('Finanze')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">💰</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Finanze</span></button>
+            <button onclick="requestAuth('Diario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">✍️</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Diario</span></button>
+            <button onclick="requestAuth('Inventario')" class="glass p-8 rounded-[2rem] flex flex-col items-center active:scale-95"><span class="text-4xl mb-3">📦</span><span class="text-[10px] uppercase font-black text-emerald-400 font-mono">Inventario</span></button>
+            <button onclick="requestAuth('Spesa')" class="glass p-8 rounded-[2rem] flex flex-col items-center border border-emerald-500/30 active:scale-95"><span class="text-4xl mb-3">🛒</span><span class="text-[10px] uppercase text-emerald-500 font-black font-mono">Spesa</span></button>
         </div>
 
-        <button onclick="triggerExport()" class="w-full glass p-5 rounded-3xl text-emerald-500 font-black uppercase text-[10px] border border-emerald-500/20 active:scale-95 tracking-widest">Report Generativo v29.5</button>
-
         <footer class="mt-auto pb-8 flex flex-col items-center">
-            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • pappa-protocol active</p>
-            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">Lock</button>
+            <p class="text-[9px] text-gray-700 font-mono font-black mb-4 uppercase">Hysenji Dev • v29.6 THE CHRONICLE</p>
+            <button onclick="resetApp()" class="bg-red-900/10 border border-red-500/20 text-red-500 px-6 py-2 rounded-xl text-[10px] font-black uppercase">System Lock</button>
         </footer>
     </div>
 
     <div id="layerAuth" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center">
         <h2 id="authTitle" class="text-2xl font-black text-emerald-500 mb-2 uppercase tracking-tighter"></h2>
         <input type="password" id="authInput" placeholder="••••" class="bg-transparent border-b-2 border-emerald-500 w-full py-4 text-center text-4xl outline-none mb-12 text-white font-mono">
-        <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 shadow-xl shadow-emerald-500/10 uppercase">Verifica</button>
-        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline font-bold">Indietro</button>
+        <button onclick="confirmAuth()" class="w-full bg-emerald-600 p-6 rounded-3xl font-black text-white active:scale-95 shadow-xl shadow-emerald-500/10">CONFERMA</button>
+        <button onclick="closeAuth()" class="mt-8 text-gray-600 text-[10px] uppercase underline font-bold">Annulla</button>
     </div>
 
     <div id="modalInput" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/95 backdrop-blur-2xl">
@@ -109,14 +113,14 @@
         <input type="text" id="tagInput" placeholder="#tags" class="bg-transparent border-b border-white/10 w-full py-2 text-sm outline-none mb-10 text-emerald-400 font-mono italic">
         <div class="flex gap-4 mb-10">
             <button id="voiceBtn" onclick="startVoice()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">🎙️ Voice</button>
-            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white font-mono">📎 File</button>
+            <button onclick="document.getElementById('fileInput').click()" class="flex-1 bg-white/5 p-5 rounded-2xl text-[10px] font-black border border-white/10 uppercase text-white">📎 File</button>
             <input type="file" id="fileInput" class="hidden" multiple onchange="handleFiles(this)">
         </div>
         <button onclick="sendData()" id="sendBtn" class="w-full bg-emerald-600 p-6 rounded-[2.5rem] font-black text-white uppercase tracking-widest shadow-2xl">Transmit</button>
     </div>
 
     <div id="searchModal" class="hidden fixed inset-0 p-6 flex flex-col z-[800] bg-black/98">
-        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Vault Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline">CHIUDI</button></div>
+        <div class="flex justify-between items-center mb-10"><h2 id="searchModalTitle" class="text-xl font-black text-emerald-500 uppercase tracking-widest">Vault Archive</h2><button onclick="closeSearch()" class="text-gray-500 text-[10px] font-black underline font-bold">CHIUDI</button></div>
         <div class="flex gap-2 mb-8">
             <input type="text" id="searchInput" placeholder="Somma / Cerca..." class="bg-transparent border-b border-emerald-500 flex-1 py-2 text-xl outline-none text-white focus:border-white transition-all">
             <button onclick="runSearch()" id="searchBtn" class="bg-emerald-600 px-6 py-2 rounded-xl font-black text-white shadow-lg">GO</button>
@@ -127,7 +131,7 @@
     <script>
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js'); }); }
 
-        const API_URL = "https://script.google.com/macros/s/AKfycbx7EO2rVCWaiV5AJ3HQxg9z7m70MiyugAfS6oVvo1L8nyXzJo16WlQ51SIyTuhF8Auj/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbzR_sC1_KY0tc6peoA9uf4RHCY3fS35WR4s3J3kx-n63VBGYU0j70Z57EphSkUwHpPH/exec"; 
         const ANNI_VALIDI = ["1958", "1992"]; 
         const ADMIN_PIN = "pappa01";
 
@@ -141,7 +145,7 @@
 
         let pinSistema = localStorage.getItem('sap_pin_sys') || "";
         let authChiaveUsata = ""; let currentModulo = ""; let attachedFiles = [];
-        let mathMode = false; let mainChart = null;
+        let mainChart = null; let docTimer;
 
         if(pinSistema) { startApp(); }
 
@@ -163,6 +167,7 @@
 
         function startApp() { document.getElementById('layerSystem').classList.add('hidden'); document.getElementById('appContent').classList.replace('opacity-0', 'opacity-100'); awarenessEngine(); }
 
+        // --- BRAIN ENGINES (Briefing, Chips, Charts) ---
         function awarenessEngine() {
             const d = new Date(); const today = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
             const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${today}&pin=${pinSistema}&callback=processTodayBriefing`; document.body.appendChild(script);
@@ -172,10 +177,8 @@
             const briefing = document.getElementById('morningBriefing');
             const text = document.getElementById('briefingText');
             const tray = document.getElementById('smartTray');
-            let total = 0; let cats = {}; let urgentTasks = 0;
-
-            tray.innerHTML = ""; // Pulisce lo Smart Tray
-
+            let total = 0; let cats = {}; let urgent = 0;
+            tray.innerHTML = ""; 
             if(res && res.length > 0) {
                 res.forEach(r => {
                     const m = r.info.match(/(\d+[\.,]\d+|\d+)/g);
@@ -185,88 +188,54 @@
                         for(let c in CATEGORIE) { if(CATEGORIE[c].some(k => r.info.toLowerCase().includes(k))) foundCat = c; }
                         cats[foundCat] = (cats[foundCat] || 0) + val;
                     }
-                    if(r.info.toLowerCase().includes("scade") || r.info.toLowerCase().includes("entro")) urgentTasks++;
+                    if(r.info.toLowerCase().includes("scade") || r.info.toLowerCase().includes("entro")) urgent++;
                 });
-
-                text.innerHTML = `Oggi: spesa totale <b>€${total.toFixed(2)}</b>.`;
-                
-                // 🚀 v29.5 CHIPS LOGIC
-                if(urgentTasks > 0) {
-                    tray.innerHTML += `<div class="smart-chip chip-alert" onclick="quickSearch('scade')">🚨 ${urgentTasks} SCADENZE</div>`;
-                }
-                
-                for(let c in cats) {
-                    if(cats[c] > 30) {
-                        tray.innerHTML += `<div class="smart-chip chip-warn" onclick="quickSearch('${c.split(' ')[1]}')">⚠️ SOGLIA ${c}</div>`;
-                    }
-                }
-
+                text.innerHTML = `Oggi: totale <b>€${total.toFixed(2)}</b>.`;
+                if(urgent > 0) tray.innerHTML += `<div class="smart-chip chip-alert" onclick="quickSearch('scade')">🚨 ${urgent} SCADENZE</div>`;
+                for(let c in cats) { if(cats[c] > 30) tray.innerHTML += `<div class="smart-chip chip-warn" onclick="quickSearch('${c.split(' ')[1]}')">⚠️ SOGLIA ${c}</div>`; }
                 renderNeonChart(cats);
-            } else { text.innerText = "Vault sincronizzato. Nessuna anomalia oggi."; }
+            } else { text.innerText = "Vault sincronizzato. Nessuna anomalia."; }
             briefing.classList.remove('hidden'); setTimeout(() => briefing.style.opacity = "1", 500);
-        }
-
-        function quickSearch(query) {
-            openSearchUI();
-            document.getElementById('searchInput').value = query;
-            runSearch();
         }
 
         function renderNeonChart(data) {
             const ctx = document.getElementById('expenseChart').getContext('2d');
             if (mainChart) mainChart.destroy();
-            mainChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(data),
-                    datasets: [{
-                        data: Object.values(data),
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#34d399', '#064e3b'],
-                        borderColor: '#050505',
-                        borderWidth: 1
-                    }]
-                },
-                options: { responsive: true, cutout: '75%', plugins: { legend: { display: false } } }
-            });
+            mainChart = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(data), datasets: [{ data: Object.values(data), backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#34d399', '#064e3b'], borderColor: '#050505', borderWidth: 1 }] }, options: { responsive: true, cutout: '75%', plugins: { legend: { display: false } } } });
         }
 
-        function autoCategorize(val) {
-            const suggestion = document.getElementById('categorySuggestion');
-            const lowVal = val.toLowerCase(); let found = "";
-            for(let c in CATEGORIE) { if(CATEGORIE[c].some(k => lowVal.includes(k))) found = c; }
-            if(found) { suggestion.innerText = "Rilevato: " + found; suggestion.classList.remove('hidden'); return found; } 
-            else { suggestion.classList.add('hidden'); return ""; }
+        // --- GHOST & DOCS (Hidden Features) ---
+        function startTimerDoc() { docTimer = setTimeout(() => { requestAuth('Docs'); }, 3000); }
+        function stopTimerDoc() { clearTimeout(docTimer); }
+
+        function fetchReadme() {
+            const script = document.createElement('script'); script.src = `${API_URL}?azione=GET_README&pin=${pinSistema}&callback=displayReadme`; document.body.appendChild(script);
         }
+        function displayReadme(res) {
+            if(res.html) { document.getElementById('docsContent').innerHTML = res.html; document.getElementById('layerDocs').style.display = 'flex'; }
+            else { alert("Master README non trovato."); }
+        }
+        function closeDocs() { document.getElementById('layerDocs').style.display = 'none'; document.getElementById('docsContent').innerHTML = ""; }
 
         function fetchGhostPaper() {
-            const script = document.createElement('script');
-            script.src = `${API_URL}?azione=GET_INFINITY&pin=${pinSistema}&callback=displayGhostPaper`;
-            document.body.appendChild(script);
+            const script = document.createElement('script'); script.src = `${API_URL}?azione=GET_INFINITY&pin=${pinSistema}&callback=displayGhostPaper`; document.body.appendChild(script);
         }
-
         function displayGhostPaper(res) {
             const frame = document.getElementById('ghostFrame');
             const layer = document.getElementById('layerGhostPaper');
             if(res.html) { frame.srcdoc = res.html; layer.style.display = 'flex'; }
         }
-
         function searchInGhostPaper() {
             const query = document.getElementById('ghostSearchInput').value.toLowerCase();
             const frame = document.getElementById('ghostFrame');
             if (!query) return;
             const innerDoc = frame.contentDocument || frame.contentWindow.document;
             const divs = innerDoc.querySelectorAll('div');
-            for (let div of divs) {
-                if (div.textContent.toLowerCase().includes(query)) {
-                    div.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    div.style.outline = '4px solid #10b981';
-                    setTimeout(() => div.style.outline = 'none', 3000);
-                    break;
-                }
-            }
+            for (let div of divs) { if (div.textContent.toLowerCase().includes(query)) { div.scrollIntoView({ behavior: 'smooth', block: 'center' }); div.style.outline = '4px solid #10b981'; setTimeout(() => div.style.outline = 'none', 3000); break; } }
         }
-
         function closeGhostPaper() { document.getElementById('layerGhostPaper').style.display = 'none'; }
+
+        // --- CORE LOGIC ---
         function requestAuth(mod) { currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden'); document.getElementById('authInput').value = ""; document.getElementById('authTitle').innerText = mod.toUpperCase(); }
         function confirmAuth() {
             const val = document.getElementById('authInput').value; if(!val) return;
@@ -274,6 +243,7 @@
             else { if(val !== ADMIN_PIN) return alert("PIN ERRATO."); }
             document.getElementById('layerAuth').classList.add('hidden');
             if(currentModulo === 'Infinity') fetchGhostPaper();
+            else if(currentModulo === 'Docs') fetchReadme();
             else if(currentModulo === 'Search') openSearchUI(); else openModal(currentModulo);
         }
 
@@ -282,6 +252,7 @@
         function closeAuth() { document.getElementById('layerAuth').classList.add('hidden'); }
         function openSearchUI() { document.getElementById('searchModal').classList.remove('hidden'); }
         function closeSearch() { document.getElementById('searchModal').classList.add('hidden'); }
+        function quickSearch(q) { openSearchUI(); document.getElementById('searchInput').value = q; runSearch(); }
 
         async function sendData() {
             const btn = document.getElementById('sendBtn'); btn.innerText = "INVIO...";
@@ -289,7 +260,7 @@
             const cat = autoCategorize(text);
             const payload = { pinSistema: pinSistema, authChiave: ADMIN_PIN, modulo: currentModulo, oggetto: text, keywords: document.getElementById('tagInput').value + (cat ? " " + cat : ""), files: attachedFiles, folderKey: currentModulo.toUpperCase() };
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); btn.innerText = "OK"; setTimeout(() => { closeModal(); btn.innerText = "Transmit"; }, 1000); } 
-            catch (e) { alert("Dato Inviato."); closeModal(); }
+            catch (e) { alert("Inviato."); closeModal(); }
         }
 
         function runSearch() {
@@ -302,6 +273,14 @@
             div.innerHTML = res.map(r => `<div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 mb-3"><div class="flex justify-between text-[8px] text-emerald-500 font-black mb-1 uppercase"><span>${r.modulo}</span><span>${r.data}</span></div><div class="text-sm font-bold text-white">${r.info}</div></div>`).join('');
         }
 
+        function autoCategorize(val) {
+            const suggestion = document.getElementById('categorySuggestion');
+            const lowVal = val.toLowerCase(); let found = "";
+            for(let c in CATEGORIE) { if(CATEGORIE[c].some(k => lowVal.includes(k))) found = c; }
+            if(found) { suggestion.innerText = "Rilevato: " + found; suggestion.classList.remove('hidden'); return found; } 
+            else { suggestion.classList.add('hidden'); return ""; }
+        }
+
         function startVoice() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition; if(!SR) return alert("Usa Chrome.");
             const rec = new SR(); rec.lang = 'it-IT'; const btn = document.getElementById('voiceBtn');
@@ -311,13 +290,7 @@
             rec.start();
         }
 
-        function handleFiles(input) {
-            Array.from(input.files).forEach(f => {
-                const reader = new FileReader();
-                reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); };
-                reader.readAsDataURL(f);
-            });
-        }
+        function handleFiles(input) { Array.from(input.files).forEach(f => { const reader = new FileReader(); reader.onload = (e) => { attachedFiles.push({ data: e.target.result.split(',')[1], name: f.name, type: f.type }); }; reader.readAsDataURL(f); }); }
         function resetApp() { localStorage.removeItem('sap_pin_sys'); location.reload(); }
     </script>
 </body>
