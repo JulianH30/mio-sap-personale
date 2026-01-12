@@ -16,8 +16,7 @@
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         #layerSystem { z-index: 1000; }
         #layerAuth { z-index: 900; }
-        /* Layer speciale per Infinity Paper */
-        #layerGhostPaper { z-index: 1100; background: #000; display: none; }
+        #layerGhostPaper { z-index: 1100; background: #000; display: none; position: fixed; inset: 0; }
         #modalInput, #searchModal { z-index: 800; background: rgba(0,0,0,0.98); }
         .loader { border: 2px solid rgba(16, 185, 129, 0.1); border-top: 2px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -37,7 +36,7 @@
         <p id="errorSys" class="text-red-600 text-[10px] mt-8 hidden font-bold animate-pulse">PIN ERRATO</p>
     </div>
 
-    <div id="layerGhostPaper" class="fixed inset-0 flex flex-col">
+    <div id="layerGhostPaper" class="flex flex-col">
         <header class="p-4 glass flex justify-between items-center">
             <h2 class="text-emerald-500 font-black uppercase text-xs tracking-widest">Ghost Paper View</h2>
             <button onclick="closeGhostPaper()" class="bg-red-900/40 text-red-500 px-4 py-1 rounded-lg text-[10px] font-black uppercase">Chiudi</button>
@@ -161,7 +160,7 @@
 
         function awarenessEngine() {
             const d = new Date(); const today = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
-            const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${encodeURIComponent(today)}&pin=${pinSistema}&callback=processTodayBriefing`; document.body.appendChild(script);
+            const script = document.createElement('script'); script.src = `${API_URL}?azione=RICERCA&query=${today}&pin=${pinSistema}&callback=processTodayBriefing`; document.body.appendChild(script);
         }
 
         function processTodayBriefing(res) {
@@ -204,14 +203,13 @@
             const frame = document.getElementById('ghostFrame');
             const layer = document.getElementById('layerGhostPaper');
             if(res.html) {
-                frame.srcdoc = res.html; // Inietta l'HTML in modo sicuro nell'iframe
+                frame.srcdoc = res.html;
                 layer.style.display = 'flex';
-            } else { alert("Impossibile recuperare il file."); }
+            } else { alert("Errore nel recupero file."); }
         }
 
         function closeGhostPaper() { document.getElementById('layerGhostPaper').style.display = 'none'; }
 
-        // --- AUTH & CORE ---
         function requestAuth(mod) { currentModulo = mod; document.getElementById('layerAuth').classList.remove('hidden'); document.getElementById('authInput').value = ""; document.getElementById('authTitle').innerText = mod.toUpperCase(); }
         function confirmAuth() {
             const val = document.getElementById('authInput').value; if(!val) return;
